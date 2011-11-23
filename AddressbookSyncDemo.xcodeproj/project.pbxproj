@@ -19,6 +19,13 @@
 		E2BB1DFB147D3CCC002263D0 /* AddressbookSyncDemo.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = E2BB1DF9147D3CCC002263D0 /* AddressbookSyncDemo.xcdatamodeld */; };
 		E2BB1DFE147D3CCC002263D0 /* MasterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E2BB1DFD147D3CCC002263D0 /* MasterViewController.m */; };
 		E2BB1E01147D3CCC002263D0 /* DetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E2BB1E00147D3CCC002263D0 /* DetailViewController.m */; };
+		E2BB1E08147D3DAE002263D0 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E2BB1E07147D3DAE002263D0 /* AddressBook.framework */; };
+		E2BB1E0A147D3DB1002263D0 /* AddressBookUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E2BB1E09147D3DB1002263D0 /* AddressBookUI.framework */; };
+		E2BB1E0D147D3EAB002263D0 /* Contact.m in Sources */ = {isa = PBXBuildFile; fileRef = E2BB1E0C147D3EAB002263D0 /* Contact.m */; };
+		E2BB1E12147D4482002263D0 /* NSManagedObjectContext+SearchExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = E2BB1E0F147D447F002263D0 /* NSManagedObjectContext+SearchExtensions.m */; };
+		E2BB1E13147D4482002263D0 /* NSObject+BlockExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = E2BB1E11147D4480002263D0 /* NSObject+BlockExtensions.m */; };
+		E2BB1E1B147D7E59002263D0 /* ShowContactDetails.m in Sources */ = {isa = PBXBuildFile; fileRef = E2BB1E1A147D7E53002263D0 /* ShowContactDetails.m */; };
+		E2BB1E1E147D88E9002263D0 /* ContactSyncHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = E2BB1E1D147D88E8002263D0 /* ContactSyncHandler.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,6 +47,19 @@
 		E2BB1DFD147D3CCC002263D0 /* MasterViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MasterViewController.m; sourceTree = "<group>"; };
 		E2BB1DFF147D3CCC002263D0 /* DetailViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DetailViewController.h; sourceTree = "<group>"; };
 		E2BB1E00147D3CCC002263D0 /* DetailViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DetailViewController.m; sourceTree = "<group>"; };
+		E2BB1E07147D3DAE002263D0 /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
+		E2BB1E09147D3DB1002263D0 /* AddressBookUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBookUI.framework; path = System/Library/Frameworks/AddressBookUI.framework; sourceTree = SDKROOT; };
+		E2BB1E0B147D3EAB002263D0 /* Contact.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Contact.h; sourceTree = "<group>"; };
+		E2BB1E0C147D3EAB002263D0 /* Contact.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Contact.m; sourceTree = "<group>"; };
+		E2BB1E0E147D447E002263D0 /* NSManagedObjectContext+SearchExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSManagedObjectContext+SearchExtensions.h"; sourceTree = "<group>"; };
+		E2BB1E0F147D447F002263D0 /* NSManagedObjectContext+SearchExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSManagedObjectContext+SearchExtensions.m"; sourceTree = "<group>"; };
+		E2BB1E10147D447F002263D0 /* NSObject+BlockExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+BlockExtensions.h"; sourceTree = "<group>"; };
+		E2BB1E11147D4480002263D0 /* NSObject+BlockExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+BlockExtensions.m"; sourceTree = "<group>"; };
+		E2BB1E18147D58A7002263D0 /* AddressbookSyncDemo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = AddressbookSyncDemo.entitlements; sourceTree = "<group>"; };
+		E2BB1E19147D7E52002263D0 /* ShowContactDetails.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShowContactDetails.h; sourceTree = "<group>"; };
+		E2BB1E1A147D7E53002263D0 /* ShowContactDetails.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShowContactDetails.m; sourceTree = "<group>"; };
+		E2BB1E1C147D88E6002263D0 /* ContactSyncHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ContactSyncHandler.h; sourceTree = "<group>"; };
+		E2BB1E1D147D88E8002263D0 /* ContactSyncHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ContactSyncHandler.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -47,6 +67,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E2BB1E0A147D3DB1002263D0 /* AddressBookUI.framework in Frameworks */,
+				E2BB1E08147D3DAE002263D0 /* AddressBook.framework in Frameworks */,
 				E2BB1DE0147D3CCC002263D0 /* UIKit.framework in Frameworks */,
 				E2BB1DE2147D3CCC002263D0 /* Foundation.framework in Frameworks */,
 				E2BB1DE4147D3CCC002263D0 /* CoreGraphics.framework in Frameworks */,
@@ -60,6 +82,8 @@
 		E2BB1DD0147D3CCC002263D0 = {
 			isa = PBXGroup;
 			children = (
+				E2BB1E09147D3DB1002263D0 /* AddressBookUI.framework */,
+				E2BB1E07147D3DAE002263D0 /* AddressBook.framework */,
 				E2BB1DE7147D3CCC002263D0 /* AddressbookSyncDemo */,
 				E2BB1DDE147D3CCC002263D0 /* Frameworks */,
 				E2BB1DDC147D3CCC002263D0 /* Products */,
@@ -88,6 +112,7 @@
 		E2BB1DE7147D3CCC002263D0 /* AddressbookSyncDemo */ = {
 			isa = PBXGroup;
 			children = (
+				E2BB1E18147D58A7002263D0 /* AddressbookSyncDemo.entitlements */,
 				E2BB1DF0147D3CCC002263D0 /* AppDelegate.h */,
 				E2BB1DF1147D3CCC002263D0 /* AppDelegate.m */,
 				E2BB1DF3147D3CCC002263D0 /* MainStoryboard_iPhone.storyboard */,
@@ -98,6 +123,16 @@
 				E2BB1E00147D3CCC002263D0 /* DetailViewController.m */,
 				E2BB1DF9147D3CCC002263D0 /* AddressbookSyncDemo.xcdatamodeld */,
 				E2BB1DE8147D3CCC002263D0 /* Supporting Files */,
+				E2BB1E0B147D3EAB002263D0 /* Contact.h */,
+				E2BB1E0C147D3EAB002263D0 /* Contact.m */,
+				E2BB1E0E147D447E002263D0 /* NSManagedObjectContext+SearchExtensions.h */,
+				E2BB1E0F147D447F002263D0 /* NSManagedObjectContext+SearchExtensions.m */,
+				E2BB1E10147D447F002263D0 /* NSObject+BlockExtensions.h */,
+				E2BB1E11147D4480002263D0 /* NSObject+BlockExtensions.m */,
+				E2BB1E19147D7E52002263D0 /* ShowContactDetails.h */,
+				E2BB1E1A147D7E53002263D0 /* ShowContactDetails.m */,
+				E2BB1E1C147D88E6002263D0 /* ContactSyncHandler.h */,
+				E2BB1E1D147D88E8002263D0 /* ContactSyncHandler.m */,
 			);
 			path = AddressbookSyncDemo;
 			sourceTree = "<group>";
@@ -181,6 +216,11 @@
 				E2BB1DFB147D3CCC002263D0 /* AddressbookSyncDemo.xcdatamodeld in Sources */,
 				E2BB1DFE147D3CCC002263D0 /* MasterViewController.m in Sources */,
 				E2BB1E01147D3CCC002263D0 /* DetailViewController.m in Sources */,
+				E2BB1E0D147D3EAB002263D0 /* Contact.m in Sources */,
+				E2BB1E12147D4482002263D0 /* NSManagedObjectContext+SearchExtensions.m in Sources */,
+				E2BB1E13147D4482002263D0 /* NSObject+BlockExtensions.m in Sources */,
+				E2BB1E1B147D7E59002263D0 /* ShowContactDetails.m in Sources */,
+				E2BB1E1E147D88E9002263D0 /* ContactSyncHandler.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -264,10 +304,13 @@
 		E2BB1E05147D3CCC002263D0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = AddressbookSyncDemo/AddressbookSyncDemo.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Tom Fewster (26H8M8U3AJ)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AddressbookSyncDemo/AddressbookSyncDemo-Prefix.pch";
 				INFOPLIST_FILE = "AddressbookSyncDemo/AddressbookSyncDemo-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "282DCBB1-8F7B-48E6-B675-10ECAEAFAC72";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -275,10 +318,13 @@
 		E2BB1E06147D3CCC002263D0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = AddressbookSyncDemo/AddressbookSyncDemo.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Tom Fewster (26H8M8U3AJ)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AddressbookSyncDemo/AddressbookSyncDemo-Prefix.pch";
 				INFOPLIST_FILE = "AddressbookSyncDemo/AddressbookSyncDemo-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "282DCBB1-8F7B-48E6-B675-10ECAEAFAC72";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

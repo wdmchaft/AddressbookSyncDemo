@@ -9,6 +9,9 @@
 #import "MasterViewController.h"
 
 #import "DetailViewController.h"
+#import "Contact.h"
+#import "AppDelegate.h"
+#import "ShowContactDetails.h"
 
 @interface MasterViewController ()
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
@@ -19,6 +22,34 @@
 @synthesize detailViewController = _detailViewController;
 @synthesize fetchedResultsController = __fetchedResultsController;
 @synthesize managedObjectContext = __managedObjectContext;
+
+
+- (IBAction)showPeoplePickerController:(id)sender {
+	ABPeoplePickerNavigationController *picker = [[ABPeoplePickerNavigationController alloc] init];
+    picker.peoplePickerDelegate = self;
+	// Display only a person's phone, email, and birthdate
+	NSArray *displayedItems = [NSArray arrayWithObjects:[NSNumber numberWithInt:kABPersonPhoneProperty], 
+							   [NSNumber numberWithInt:kABPersonEmailProperty],
+							   [NSNumber numberWithInt:kABPersonBirthdayProperty], nil];
+	
+	
+	picker.displayedProperties = displayedItems;
+	if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+		picker.modalPresentationStyle = UIModalPresentationFormSheet;
+	}
+	// Show the picker 
+	[self presentModalViewController:picker animated:YES];
+}
+
+- (void)reloadFetchedResults:(NSNotification*)note {
+    NSError *error = nil;
+	if (![[self fetchedResultsController] performFetch:&error]) {
+		NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+		abort();
+	}		
+    
+	[self.tableView reloadData];
+}
 
 - (void)awakeFromNib
 {
@@ -42,11 +73,10 @@
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
 	self.detailViewController = (DetailViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
-	// Set up the edit and add buttons.
-	self.navigationItem.leftBarButtonItem = self.editButtonItem;
-
-	UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(insertNewObject)];
-	self.navigationItem.rightBarButtonItem = addButton;
+	
+	[self reloadFetchedResults:nil];
+	// observe the app delegate telling us when it's finished asynchronously setting up the persistent store
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadFetchedResults:) name:@"RefetchAllDatabaseData" object:[[UIApplication sharedApplication] delegate]];
 }
 
 - (void)viewDidUnload
@@ -54,6 +84,7 @@
     [super viewDidUnload];
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -146,17 +177,34 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
-        NSManagedObject *selectedObject = [[self fetchedResultsController] objectAtIndexPath:indexPath];
-        self.detailViewController.detailItem = selectedObject;    
+	Contact *selectedObject = [[self fetchedResultsController] objectAtIndexPath:indexPath];
+	if (selectedObject.addressbookIdentifier && [selectedObject findAddressbookRecord] != NULL) {
+		UIViewController *personViewController = [ShowContactDetails viewControllerForDisplayingContact:selectedObject];
+		if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+			//self.detailViewController
+			UINavigationController *detailNavigationController = (UINavigationController *)[self.splitViewController.viewControllers lastObject];
+			detailNavigationController.viewControllers = [NSArray arrayWithObject:personViewController];
+		} else {
+			[self.navigationController pushViewController:personViewController animated:YES];
+		}
+	} else {
+		if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+			//self.detailViewController
+			UINavigationController *detailNavigationController = (UINavigationController *)[self.splitViewController.viewControllers lastObject];
+			detailNavigationController.viewControllers = [NSArray arrayWithObject:self.detailViewController];
+	        self.detailViewController.detailItem = selectedObject;
+		} else {
+	        self.detailViewController.detailItem = selectedObject;
+			[self performSegueWithIdentifier:@"noDetails" sender:self];
+		}
     }
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
-    if ([[segue identifier] isEqualToString:@"showDetail"]) {
+    if ([[segue identifier] isEqualToString:@"noDetails"]) {
         NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
-        NSManagedObject *selectedObject = [[self fetchedResultsController] objectAtIndexPath:indexPath];
+        Contact *selectedObject = [[self fetchedResultsController] objectAtIndexPath:indexPath];
         [[segue destinationViewController] setDetailItem:selectedObject];
     }
 }
@@ -173,14 +221,14 @@
     // Create the fetch request for the entity.
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     // Edit the entity name as appropriate.
-    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Event" inManagedObjectContext:self.managedObjectContext];
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Contact" inManagedObjectContext:self.managedObjectContext];
     [fetchRequest setEntity:entity];
     
     // Set the batch size to a suitable number.
     [fetchRequest setFetchBatchSize:20];
     
     // Edit the sort key as appropriate.
-    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"timeStamp" ascending:NO];
+    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"lastName" ascending:NO];
     NSArray *sortDescriptors = [NSArray arrayWithObjects:sortDescriptor, nil];
     
     [fetchRequest setSortDescriptors:sortDescriptors];
@@ -267,32 +315,48 @@
 
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath
 {
-    NSManagedObject *managedObject = [self.fetchedResultsController objectAtIndexPath:indexPath];
-    cell.textLabel.text = [[managedObject valueForKey:@"timeStamp"] description];
+    Contact *contact = [self.fetchedResultsController objectAtIndexPath:indexPath];
+    cell.textLabel.text = [contact compositeName];
+	cell.detailTextLabel.text = contact.addressbookIdentifier?contact.addressbookIdentifier:@"Contact not found";
 }
 
-- (void)insertNewObject
+#pragma mark -
+#pragma mark ABPeoplePickerNavigationControllerDelegate methods
+// Displays the information of a selected person
+- (BOOL)peoplePickerNavigationController:(ABPeoplePickerNavigationController *)peoplePicker shouldContinueAfterSelectingPerson:(ABRecordRef)person
 {
-    // Create a new instance of the entity managed by the fetched results controller.
-    NSManagedObjectContext *context = [self.fetchedResultsController managedObjectContext];
-    NSEntityDescription *entity = [[self.fetchedResultsController fetchRequest] entity];
-    NSManagedObject *newManagedObject = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:context];
-    
-    // If appropriate, configure the new managed object.
-    // Normally you should use accessor methods, but using KVC here avoids the need to add a custom class to the template.
-    [newManagedObject setValue:[NSDate date] forKey:@"timeStamp"];
-    
-    // Save the context.
-    NSError *error = nil;
-    if (![context save:&error]) {
-        /*
-         Replace this implementation with code to handle the error appropriately.
-         
-         abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development. 
-         */
-        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-        abort();
-    }
+	[self dismissModalViewControllerAnimated:YES];
+	
+	// Check if we already have this contact in out object tree
+	if ([Contact findContactForRecordId:ABRecordGetRecordID(person)] != nil) {
+		[self performBlock:^{
+			UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Add Contact Failed" message:@"Contact already exists" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
+			[alert show];
+		} afterDelay:0.0f];
+		return YES;
+	}
+	
+	// Add this contact to the Object Graph
+	Contact *contact = [Contact initContactWithAddressbookRecord:person];
+	NSLog(@"Adding %@", [contact compositeName]);
+	
+	[(AppDelegate *)[UIApp delegate] saveContext];
+	
+	return NO;
 }
 
+
+// Does not allow users to perform default actions such as dialing a phone number, when they select a person property.
+- (BOOL)peoplePickerNavigationController:(ABPeoplePickerNavigationController *)peoplePicker shouldContinueAfterSelectingPerson:(ABRecordRef)person 
+								property:(ABPropertyID)property identifier:(ABMultiValueIdentifier)identifier
+{
+	return NO;
+}
+
+
+// Dismisses the people picker and shows the application when users tap Cancel. 
+- (void)peoplePickerNavigationControllerDidCancel:(ABPeoplePickerNavigationController *)peoplePicker;
+{
+	[self dismissModalViewControllerAnimated:YES];
+}
 @end

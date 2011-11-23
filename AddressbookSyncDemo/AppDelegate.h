@@ -8,7 +8,11 @@
 
 #import <UIKit/UIKit.h>
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate>
+@class ContactSyncHandler;
+
+@interface AppDelegate : UIResponder <UIApplicationDelegate> {
+	ContactSyncHandler *contactSyncHandler;
+}
 
 @property (strong, nonatomic) UIWindow *window;
 
@@ -17,6 +21,6 @@
 @property (readonly, strong, nonatomic) NSPersistentStoreCoordinator *persistentStoreCoordinator;
 
 - (void)saveContext;
-- (NSURL *)applicationDocumentsDirectory;
+- (NSString *)applicationDocumentsDirectory;
 
 @end
