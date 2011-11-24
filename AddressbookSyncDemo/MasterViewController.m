@@ -13,6 +13,20 @@
 #import "AppDelegate.h"
 #import "ShowContactDetails.h"
 
+///////// START PRIVATE API //////////
+// This is really a private API store in the Contact class
+@interface ContactMappingCache : NSObject {
+@private
+    NSDictionary *_mappings;
+}
++ (ContactMappingCache *)sharedInstance;
+- (NSString *)identifierForContact:(Contact *)contact;
+- (void)setIdentifier:(NSString *)identifier forContact:(Contact *)contact;
+- (void)removeIdentifierForContact:(Contact *)contact;
+@end
+
+///////// END PRIVATE API //////////
+
 @interface MasterViewController ()
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
 @end
@@ -39,6 +53,16 @@
 	}
 	// Show the picker 
 	[self presentModalViewController:picker animated:YES];
+}
+
+- (IBAction)destroyCache:(id)sender {
+	for (Contact *contact in [[self fetchedResultsController] fetchedObjects]) {
+		[[ContactMappingCache sharedInstance] removeIdentifierForContact:contact];
+		contact.addressbookIdentifier = nil;
+	}
+	
+	[self.tableView reloadData];
+	NSLog(@"Cache cleared");
 }
 
 - (void)reloadFetchedResults:(NSNotification*)note {

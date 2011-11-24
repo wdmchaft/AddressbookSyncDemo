@@ -20,6 +20,7 @@ typedef enum {
 
 @interface Contact : NSManagedObject {
 	AddressbookCacheState addressbookCacheState;
+	ABRecordRef addressbookRecord;
 }
 
 @property (nonatomic, strong) NSDate * lastSync;

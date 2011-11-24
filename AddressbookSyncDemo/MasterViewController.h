@@ -22,6 +22,7 @@
 @property (strong, nonatomic) NSFetchedResultsController *fetchedResultsController;
 @property (strong, nonatomic) NSManagedObjectContext *managedObjectContext;
 
+- (IBAction)destroyCache:(id)sender;
 - (IBAction)showPeoplePickerController:(id)sender;
 
 @end

@@ -11,10 +11,12 @@
 @interface ContactMappingCache : NSObject {
 @private
     NSDictionary *_mappings;
+	BOOL _changed;
 }
 + (ContactMappingCache *)sharedInstance;
 - (NSString *)identifierForContact:(Contact *)contact;
 - (void)setIdentifier:(NSString *)identifier forContact:(Contact *)contact;
+- (void)removeIdentifierForContact:(Contact *)contact;
 @end
 
 @implementation ContactMappingCache
@@ -33,20 +35,27 @@
 		NSURL *documentsDirectory = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
 		_mappings = [NSDictionary dictionaryWithContentsOfURL:[documentsDirectory URLByAppendingPathComponent:@"contactMapping.plist"]];
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveRequest:) name:NSManagedObjectContextDidSaveNotification object:nil];
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveRequest:) name:UIApplicationWillResignActiveNotification object:nil];
 	}
 	return self;
 }
 
 - (void)dealloc {
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:nil];
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillResignActiveNotification object:nil];
 }
 
 - (void)saveRequest:(NSNotification *)notification {
-	NSURL *documentsDirectory = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
-	if (![_mappings writeToURL:[documentsDirectory URLByAppendingPathComponent:@"contactMapping.plist"] atomically:YES]) {
-		NSLog(@"Failed to write contactMapping.plist");
+	if (_changed) {
+		NSURL *documentsDirectory = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
+		if (![_mappings writeToURL:[documentsDirectory URLByAppendingPathComponent:@"contactMapping.plist"] atomically:YES]) {
+			NSLog(@"Failed to write contactMapping.plist");
+		} else {
+			NSLog(@"Contact Mappings saved");
+			_changed = NO;
+		}
 	} else {
-		NSLog(@"Contact Mappings saved");
+		NSLog(@"No contact mappings changes to save");
 	}
 }
 
@@ -60,6 +69,7 @@
 	NSString *key = [[contact.objectID URIRepresentation] absoluteString];
 	[newMappings setObject:identifier forKey:key];
 	_mappings = [NSDictionary dictionaryWithDictionary:newMappings];
+	_changed = YES;
 }
 
 - (void)removeIdentifierForContact:(Contact *)contact {
@@ -67,6 +77,7 @@
 	NSString *key = [[contact.objectID URIRepresentation] absoluteString];
 	[newMappings removeObjectForKey:key];
 	_mappings = [NSDictionary dictionaryWithDictionary:newMappings];
+	_changed = YES;
 }
 
 @end
@@ -146,14 +157,41 @@
 			
 		}]];
 		
-		if ([filteredPeople count] == 0) {
-			NSLog(@"No match found for contact"); // %@", self.compositeName);
-		}
+		NSUInteger count = [filteredPeople count];
 		
-		ABRecordRef record;
-		for (NSUInteger i = 0; i < [filteredPeople count]; i++) {
-			record = (__bridge ABRecordRef)[filteredPeople objectAtIndex:i];
-			NSLog(@"Match on '%@' [%d]", (__bridge_transfer NSString *)ABRecordCopyCompositeName(record), ABRecordGetRecordID(record));
+		if (count == 0) {
+			NSLog(@"No match found for contact"); // %@", self.compositeName);
+			self.addressbookCacheState = kAddressbookCacheLoadFailed;
+		} else if (count == 1) {
+			addressbookRecord = (__bridge ABRecordRef)[filteredPeople lastObject];
+			self.addressbookIdentifier = [NSString stringWithFormat:@"%d", ABRecordGetRecordID(addressbookRecord)];
+			[[ContactMappingCache sharedInstance] setIdentifier:self.addressbookIdentifier forContact:self];
+			NSLog(@"Match on '%@' [%d]", (__bridge_transfer NSString *)ABRecordCopyCompositeName(addressbookRecord), ABRecordGetRecordID(addressbookRecord));
+		} else {
+			NSLog(@"Potentially Ambigous results found");
+			// However, the results isn't ambigous if all other contacts are accounted for by other Contacts objects
+			NSArray *filteredPeopleAccountedFor = [people filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary *bindings) {
+				return ([Contact findContactForRecordId:ABRecordGetRecordID((__bridge ABRecordRef)evaluatedObject)] != nil);
+			}]];
+
+			NSUInteger filteredCount = [filteredPeopleAccountedFor count];
+			if (filteredCount == 0) {
+				NSLog(@"Search exhasted - all possibilies are accounted for");
+				self.addressbookCacheState = kAddressbookCacheLoadFailed;
+			} if (filteredCount == 1) {
+				addressbookRecord = (__bridge ABRecordRef)[filteredPeopleAccountedFor lastObject];
+				self.addressbookIdentifier = [NSString stringWithFormat:@"%d", ABRecordGetRecordID(addressbookRecord)];
+				[[ContactMappingCache sharedInstance] setIdentifier:self.addressbookIdentifier forContact:self];
+				NSLog(@"Match on '%@' [%d]", (__bridge_transfer NSString *)ABRecordCopyCompositeName(addressbookRecord), ABRecordGetRecordID(addressbookRecord));
+			} else {
+				NSLog(@"Still Ambigous results found");
+				ABRecordRef record;
+				for (NSUInteger i = 0; i < [filteredPeopleAccountedFor count]; i++) {
+					record = (__bridge ABRecordRef)[filteredPeopleAccountedFor objectAtIndex:i];
+					NSLog(@"Match on '%@' [%d]", (__bridge_transfer NSString *)ABRecordCopyCompositeName(record), ABRecordGetRecordID(record));
+				}
+				self.addressbookCacheState = kAddressbookCacheLoadFailed;
+			}
 		}
 	}
 	
@@ -162,6 +200,10 @@
 
 - (void)setAddressbookIdentifier:(NSString *)identifier {
 	addressbookIdentifier = identifier;
+	// we also need to reload our ABRecordRef if appropriate
+	if (addressbookRecord) {
+		[self findAddressbookRecord];
+	}
 }
 
 - (BOOL)isContactOlderThanAddressbookRecord:(ABRecordRef)record {
@@ -173,10 +215,14 @@
 }
 
 - (ABRecordRef)findAddressbookRecord {
-	if (!self.addressbookIdentifier) {
-		return nil;
+	if (!addressbookRecord) {
+		if (self.addressbookIdentifier) {
+			addressbookRecord = ABAddressBookGetPersonWithRecordID(ABAddressBookCreate(), (ABRecordID)[self.addressbookIdentifier integerValue]);
+			self.addressbookCacheState = kAddressbookCacheLoaded;
+		}
 	}
-	return ABAddressBookGetPersonWithRecordID(ABAddressBookCreate(), (ABRecordID)[self.addressbookIdentifier integerValue]);
+	
+	return addressbookRecord;
 }
 
 - (NSString *)compositeName {
