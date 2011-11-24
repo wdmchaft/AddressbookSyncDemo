@@ -10,13 +10,24 @@
 #import <CoreData/CoreData.h>
 #import <AddressBook/AddressBook.h>
 
-@interface Contact : NSManagedObject
+typedef enum {
+	kAddressbookCacheNotLoaded,
+	kAddressbookCacheCurrentlyLoading,
+	kAddressbookCacheLoadFailed,
+	kAddressbookCacheLoaded
+} AddressbookCacheState;
+
+
+@interface Contact : NSManagedObject {
+	AddressbookCacheState addressbookCacheState;
+}
 
 @property (nonatomic, strong) NSDate * lastSync;
 @property (nonatomic, strong) NSString * firstName;
 @property (nonatomic, strong) NSString * lastName;
 @property (nonatomic, strong) NSString * company;
 @property (nonatomic, strong) NSString * addressbookIdentifier;
+@property (nonatomic) AddressbookCacheState addressbookCacheState;
 @property (nonatomic) BOOL isCompany;
 @property (nonatomic) int16_t syncStatus;
 

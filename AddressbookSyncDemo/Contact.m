@@ -32,39 +32,59 @@
 	if (self = [super init]) {
 		NSURL *documentsDirectory = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
 		_mappings = [NSDictionary dictionaryWithContentsOfURL:[documentsDirectory URLByAppendingPathComponent:@"contactMapping.plist"]];
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveRequest:) name:NSManagedObjectContextDidSaveNotification object:nil];
 	}
 	return self;
 }
 
+- (void)dealloc {
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:nil];
+}
+
+- (void)saveRequest:(NSNotification *)notification {
+	NSURL *documentsDirectory = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
+	if (![_mappings writeToURL:[documentsDirectory URLByAppendingPathComponent:@"contactMapping.plist"] atomically:YES]) {
+		NSLog(@"Failed to write contactMapping.plist");
+	} else {
+		NSLog(@"Contact Mappings saved");
+	}
+}
+
 - (NSString *)identifierForContact:(Contact *)contact {
-	return [_mappings objectForKey:[NSNumber numberWithInteger:[[contact.objectID URIRepresentation] hash]]];
+	NSString *key = [[contact.objectID URIRepresentation] absoluteString];
+	return [_mappings objectForKey:key];
 }
 
 - (void)setIdentifier:(NSString *)identifier forContact:(Contact *)contact {
 	NSMutableDictionary *newMappings = [NSMutableDictionary dictionaryWithDictionary:_mappings];
-	[newMappings setObject:identifier forKey:[NSNumber numberWithInteger:[[contact.objectID URIRepresentation] hash]]];
-	NSURL *documentsDirectory = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
-	if (![newMappings writeToURL:[documentsDirectory URLByAppendingPathComponent:@"contactMapping.plist"] atomically:YES]) {
-		NSLog(@"Failed to write contactMapping.plist");
-	}
+	NSString *key = [[contact.objectID URIRepresentation] absoluteString];
+	[newMappings setObject:identifier forKey:key];
+	_mappings = [NSDictionary dictionaryWithDictionary:newMappings];
+}
+
+- (void)removeIdentifierForContact:(Contact *)contact {
+	NSMutableDictionary *newMappings = [NSMutableDictionary dictionaryWithDictionary:_mappings];
+	NSString *key = [[contact.objectID URIRepresentation] absoluteString];
+	[newMappings removeObjectForKey:key];
 	_mappings = [NSDictionary dictionaryWithDictionary:newMappings];
 }
 
 @end
 
+@interface Contact (private)
+- (void)updateManagedObjectWithAddressbookRecord:(ABRecordRef)record;
+@end
+
 @implementation Contact
 
 @synthesize addressbookIdentifier;
+@synthesize addressbookCacheState;
 @dynamic lastSync;
 @dynamic firstName;
 @dynamic lastName;
 @dynamic company;
 @dynamic isCompany;
 @dynamic syncStatus;
-
-@interface Contact (private)
-- (void)updateManagedObjectWithAddressbookRecord:(ABRecordRef)record;
-@end
 
 + (Contact *)initContactWithAddressbookRecord:(ABRecordRef)record {
 	// Add this contact to the Object Graph
@@ -83,9 +103,34 @@
 	return [results anyObject];
 }
 
+- (void)awakeFromFetch {
+	[super awakeFromFetch];
+	self.addressbookCacheState = kAddressbookCacheNotLoaded;
+}
+
+- (void)awakeFromInsert {
+	[super awakeFromInsert];
+	self.addressbookCacheState = kAddressbookCacheNotLoaded;
+}
+
+- (void)didSave {
+	if ([self isDeleted]) {
+		NSLog(@"Removing identifier from Contacts Mapping");
+		[[ContactMappingCache sharedInstance] removeIdentifierForContact:self];
+	} else if (addressbookIdentifier) {
+		NSLog(@"Adding/Updating identifier in Contacts Mapping");
+		[[ContactMappingCache sharedInstance] setIdentifier:addressbookIdentifier forContact:self];
+	}	
+}
+
 - (NSString *)addressbookIdentifier {
 	if (addressbookIdentifier == nil) {
 		addressbookIdentifier = [[ContactMappingCache sharedInstance] identifierForContact:self];
+	}
+	
+	if (addressbookIdentifier == nil && self.addressbookCacheState == kAddressbookCacheNotLoaded) {
+		NSLog(@"We need to look up the contact & attempt to sync with Addressbook");
+		CFArrayRef *people = ABAddressBookCopyPeopleWithName(ABAddressbookCreate(), self.compositeName);
 	}
 	
 	return addressbookIdentifier;
@@ -93,7 +138,6 @@
 
 - (void)setAddressbookIdentifier:(NSString *)identifier {
 	addressbookIdentifier = identifier;
-	[[ContactMappingCache sharedInstance] setIdentifier:identifier forContact:self];
 }
 
 - (BOOL)isContactOlderThanAddressbookRecord:(ABRecordRef)record {
@@ -105,14 +149,27 @@
 }
 
 - (ABRecordRef)findAddressbookRecord {
+	if (!self.addressbookIdentifier) {
+		return nil;
+	}
 	return ABAddressBookGetPersonWithRecordID(ABAddressBookCreate(), (ABRecordID)[self.addressbookIdentifier integerValue]);
 }
 
 - (NSString *)compositeName {
-	if (self.isCompany) {
-		return self.company;
+
+	ABRecordRef person = self.findAddressbookRecord;
+	if (person != nil) {
+		return (__bridge_transfer NSString *)ABRecordCopyCompositeName(self.findAddressbookRecord); 
 	} else {
-		return [NSString stringWithFormat:@"%@ %@", self.firstName, self.lastName];
+		if (self.isCompany) {
+			return self.company;
+		} else {
+			if (ABPersonGetCompositeNameFormat() == kABPersonCompositeNameFormatFirstNameFirst) {
+				return [NSString stringWithFormat:@"%@ %@", self.firstName, self.lastName];
+			} else {
+				return [NSString stringWithFormat:@"%@ %@", self.lastName, self.firstName];
+			}
+		}
 	}
 }
 
