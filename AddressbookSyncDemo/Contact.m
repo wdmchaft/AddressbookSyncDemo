@@ -130,7 +130,31 @@
 	
 	if (addressbookIdentifier == nil && self.addressbookCacheState == kAddressbookCacheNotLoaded) {
 		NSLog(@"We need to look up the contact & attempt to sync with Addressbook");
-		CFArrayRef *people = ABAddressBookCopyPeopleWithName(ABAddressbookCreate(), self.compositeName);
+		NSArray *people = (__bridge_transfer NSArray *)ABAddressBookCopyArrayOfAllPeople(ABAddressBookCreate());
+		
+		NSArray *filteredPeople = [people filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary *bindings) {
+			NSString *firstName = (__bridge_transfer NSString *)ABRecordCopyValue((__bridge ABRecordRef)evaluatedObject, kABPersonFirstNameProperty);
+			NSString *lastName = (__bridge_transfer NSString *)ABRecordCopyValue((__bridge ABRecordRef)evaluatedObject, kABPersonLastNameProperty);
+			NSString *company = (__bridge_transfer NSString *)ABRecordCopyValue((__bridge ABRecordRef)evaluatedObject, kABPersonOrganizationProperty);
+			CFNumberRef personType = ABRecordCopyValue((__bridge ABRecordRef)evaluatedObject, kABPersonKindProperty);
+			BOOL isCompany = (personType == kABPersonKindOrganization);
+
+			return (((!firstName && !self.firstName)|| [firstName isEqualToString:self.firstName])
+					&& ((!lastName && !self.lastName)|| [lastName isEqualToString:self.lastName])
+					&& ((!company && !self.company)|| [company isEqualToString:self.company])
+					&& isCompany == self.isCompany);
+			
+		}]];
+		
+		if ([filteredPeople count] == 0) {
+			NSLog(@"No match found for contact"); // %@", self.compositeName);
+		}
+		
+		ABRecordRef record;
+		for (NSUInteger i = 0; i < [filteredPeople count]; i++) {
+			record = (__bridge ABRecordRef)[filteredPeople objectAtIndex:i];
+			NSLog(@"Match on '%@' [%d]", (__bridge_transfer NSString *)ABRecordCopyCompositeName(record), ABRecordGetRecordID(record));
+		}
 	}
 	
 	return addressbookIdentifier;
