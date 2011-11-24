@@ -180,11 +180,11 @@
 		if (cloudURL == nil) {
 			NSLog(@"iCloud isn't enabled on this device");
 		}
-        NSString* coreDataCloudContent = [[cloudURL path] stringByAppendingPathComponent:@"AddressbookSyncDemo_v1"];
+        NSString* coreDataCloudContent = [[cloudURL path] stringByAppendingPathComponent:@"AddressbookSyncDemo_v2"];
         cloudURL = [NSURL fileURLWithPath:coreDataCloudContent];
 		
 		//  The API to turn on Core Data iCloud support here.
-        NSDictionary* options = [NSDictionary dictionaryWithObjectsAndKeys:@"com.tomfewster.examples.addressbooksyncdemo.1", NSPersistentStoreUbiquitousContentNameKey, cloudURL, NSPersistentStoreUbiquitousContentURLKey, [NSNumber numberWithBool:YES], NSMigratePersistentStoresAutomaticallyOption, [NSNumber numberWithBool:YES], NSInferMappingModelAutomaticallyOption,nil];
+        NSDictionary* options = [NSDictionary dictionaryWithObjectsAndKeys:@"com.tomfewster.examples.addressbooksyncdemo.2", NSPersistentStoreUbiquitousContentNameKey, cloudURL, NSPersistentStoreUbiquitousContentURLKey, [NSNumber numberWithBool:YES], NSMigratePersistentStoresAutomaticallyOption, [NSNumber numberWithBool:YES], NSInferMappingModelAutomaticallyOption,nil];
 		
         NSError *error = nil;
 		

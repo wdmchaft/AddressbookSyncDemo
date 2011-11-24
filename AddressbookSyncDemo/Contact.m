@@ -17,6 +17,7 @@
 - (NSString *)identifierForContact:(Contact *)contact;
 - (void)setIdentifier:(NSString *)identifier forContact:(Contact *)contact;
 - (void)removeIdentifierForContact:(Contact *)contact;
+- (BOOL)contactExistsForIdentifier:(NSString *)identifier;
 @end
 
 @implementation ContactMappingCache
@@ -78,6 +79,10 @@
 	[newMappings removeObjectForKey:key];
 	_mappings = [NSDictionary dictionaryWithDictionary:newMappings];
 	_changed = YES;
+}
+
+- (BOOL)contactExistsForIdentifier:(NSString *)identifier {
+	return [[_mappings allValues] containsObject:identifier];
 }
 
 @end
@@ -143,6 +148,8 @@
 		NSLog(@"We need to look up the contact & attempt to sync with Addressbook");
 		NSArray *people = (__bridge_transfer NSArray *)ABAddressBookCopyArrayOfAllPeople(ABAddressBookCreate());
 		
+		
+		// Filter out everyone who matches these properties & doesn't currently have a mapping to a existing Contact
 		NSArray *filteredPeople = [people filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary *bindings) {
 			NSString *firstName = (__bridge_transfer NSString *)ABRecordCopyValue((__bridge ABRecordRef)evaluatedObject, kABPersonFirstNameProperty);
 			NSString *lastName = (__bridge_transfer NSString *)ABRecordCopyValue((__bridge ABRecordRef)evaluatedObject, kABPersonLastNameProperty);
@@ -153,7 +160,8 @@
 			return (((!firstName && !self.firstName)|| [firstName isEqualToString:self.firstName])
 					&& ((!lastName && !self.lastName)|| [lastName isEqualToString:self.lastName])
 					&& ((!company && !self.company)|| [company isEqualToString:self.company])
-					&& isCompany == self.isCompany);
+					&& isCompany == self.isCompany)
+					&& ![[ContactMappingCache sharedInstance] contactExistsForIdentifier:[NSString stringWithFormat:@"%d", ABRecordGetRecordID((__bridge ABRecordRef)evaluatedObject)]];
 			
 		}]];
 		
@@ -168,30 +176,13 @@
 			[[ContactMappingCache sharedInstance] setIdentifier:self.addressbookIdentifier forContact:self];
 			NSLog(@"Match on '%@' [%d]", (__bridge_transfer NSString *)ABRecordCopyCompositeName(addressbookRecord), ABRecordGetRecordID(addressbookRecord));
 		} else {
-			NSLog(@"Potentially Ambigous results found");
-			// However, the results isn't ambigous if all other contacts are accounted for by other Contacts objects
-			NSArray *filteredPeopleAccountedFor = [people filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary *bindings) {
-				return ([Contact findContactForRecordId:ABRecordGetRecordID((__bridge ABRecordRef)evaluatedObject)] != nil);
-			}]];
-
-			NSUInteger filteredCount = [filteredPeopleAccountedFor count];
-			if (filteredCount == 0) {
-				NSLog(@"Search exhasted - all possibilies are accounted for");
-				self.addressbookCacheState = kAddressbookCacheLoadFailed;
-			} if (filteredCount == 1) {
-				addressbookRecord = (__bridge ABRecordRef)[filteredPeopleAccountedFor lastObject];
-				self.addressbookIdentifier = [NSString stringWithFormat:@"%d", ABRecordGetRecordID(addressbookRecord)];
-				[[ContactMappingCache sharedInstance] setIdentifier:self.addressbookIdentifier forContact:self];
-				NSLog(@"Match on '%@' [%d]", (__bridge_transfer NSString *)ABRecordCopyCompositeName(addressbookRecord), ABRecordGetRecordID(addressbookRecord));
-			} else {
-				NSLog(@"Still Ambigous results found");
-				ABRecordRef record;
-				for (NSUInteger i = 0; i < [filteredPeopleAccountedFor count]; i++) {
-					record = (__bridge ABRecordRef)[filteredPeopleAccountedFor objectAtIndex:i];
-					NSLog(@"Match on '%@' [%d]", (__bridge_transfer NSString *)ABRecordCopyCompositeName(record), ABRecordGetRecordID(record));
-				}
-				self.addressbookCacheState = kAddressbookCacheLoadFailed;
+			NSLog(@"Ambigous results found");
+			ABRecordRef record;
+			for (NSUInteger i = 0; i < [filteredPeople count]; i++) {
+				record = (__bridge ABRecordRef)[filteredPeople objectAtIndex:i];
+				NSLog(@"Match on '%@' [%d]", (__bridge_transfer NSString *)ABRecordCopyCompositeName(record), ABRecordGetRecordID(record));
 			}
+			self.addressbookCacheState = kAddressbookCacheLoadFailed;
 		}
 	}
 	
