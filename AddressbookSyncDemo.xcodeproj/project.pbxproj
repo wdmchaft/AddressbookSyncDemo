@@ -26,6 +26,7 @@
 		E2BB1E13147D4482002263D0 /* NSObject+BlockExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = E2BB1E11147D4480002263D0 /* NSObject+BlockExtensions.m */; };
 		E2BB1E1B147D7E59002263D0 /* ShowContactDetails.m in Sources */ = {isa = PBXBuildFile; fileRef = E2BB1E1A147D7E53002263D0 /* ShowContactDetails.m */; };
 		E2BB1E1E147D88E9002263D0 /* ContactSyncHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = E2BB1E1D147D88E8002263D0 /* ContactSyncHandler.m */; };
+		E2CD2488147F802100550386 /* UIAlertView+BlockExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = E2CD2487147F802100550386 /* UIAlertView+BlockExtensions.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -60,6 +61,8 @@
 		E2BB1E1A147D7E53002263D0 /* ShowContactDetails.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShowContactDetails.m; sourceTree = "<group>"; };
 		E2BB1E1C147D88E6002263D0 /* ContactSyncHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ContactSyncHandler.h; sourceTree = "<group>"; };
 		E2BB1E1D147D88E8002263D0 /* ContactSyncHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ContactSyncHandler.m; sourceTree = "<group>"; };
+		E2CD2486147F802100550386 /* UIAlertView+BlockExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIAlertView+BlockExtensions.h"; sourceTree = "<group>"; };
+		E2CD2487147F802100550386 /* UIAlertView+BlockExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIAlertView+BlockExtensions.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -112,6 +115,8 @@
 		E2BB1DE7147D3CCC002263D0 /* AddressbookSyncDemo */ = {
 			isa = PBXGroup;
 			children = (
+				E2CD2486147F802100550386 /* UIAlertView+BlockExtensions.h */,
+				E2CD2487147F802100550386 /* UIAlertView+BlockExtensions.m */,
 				E2BB1E18147D58A7002263D0 /* AddressbookSyncDemo.entitlements */,
 				E2BB1DF0147D3CCC002263D0 /* AppDelegate.h */,
 				E2BB1DF1147D3CCC002263D0 /* AppDelegate.m */,
@@ -221,6 +226,7 @@
 				E2BB1E13147D4482002263D0 /* NSObject+BlockExtensions.m in Sources */,
 				E2BB1E1B147D7E59002263D0 /* ShowContactDetails.m in Sources */,
 				E2BB1E1E147D88E9002263D0 /* ContactSyncHandler.m in Sources */,
+				E2CD2488147F802100550386 /* UIAlertView+BlockExtensions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -348,6 +354,7 @@
 				E2BB1E06147D3CCC002263D0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 

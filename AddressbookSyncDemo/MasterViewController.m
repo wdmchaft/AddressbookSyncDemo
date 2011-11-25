@@ -12,6 +12,7 @@
 #import "Contact.h"
 #import "AppDelegate.h"
 #import "ShowContactDetails.h"
+#import "UIAlertView+BlockExtensions.h"
 
 ///////// START PRIVATE API //////////
 // This is really a private API store in the Contact class
@@ -202,7 +203,24 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	Contact *selectedObject = [[self fetchedResultsController] objectAtIndexPath:indexPath];
-	if (selectedObject.addressbookIdentifier && [selectedObject findAddressbookRecord] != NULL) {
+	
+	if ([selectedObject findAddressbookRecord] == NULL) {
+		// Somthing is wrong, lets try to resolve it
+		if ([selectedObject syncAddressbookRecord] == kAddressbookSyncAmbigousResults) {
+			[[[UIAlertView alloc] initWithTitle:@"Ambigous Results" message:@"Ambigous contact results found during sync" completionBlock:^(NSUInteger buttonIndex) {
+				switch(buttonIndex) {
+					case 0: // Cancelled
+						NSLog(@"Button 1");
+						break;
+					case 1: // Resolve Now
+						NSLog(@"Button 2");
+						break;
+				}
+			} cancelButtonTitle:@"Later" otherButtonTitles:@"Resolve Now"] show];
+		}
+	}
+	
+	if ([selectedObject findAddressbookRecord] != NULL) {
 		UIViewController *personViewController = [ShowContactDetails viewControllerForDisplayingContact:selectedObject];
 		if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
 			//self.detailViewController

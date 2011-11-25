@@ -17,10 +17,18 @@ typedef enum {
 	kAddressbookCacheLoaded
 } AddressbookCacheState;
 
+typedef enum {
+	kAddressbookSyncNotRequired,
+	kAddressbookSyncMatchFound,
+	kAddressbookSyncAmbigousResults,
+	kAddressbookSyncMatchFailed
+} AddressbookResyncResults;
+
+extern NSString *kContactSyncStateChanged;
 
 @interface Contact : NSManagedObject {
-	AddressbookCacheState addressbookCacheState;
-	ABRecordRef addressbookRecord;
+	AddressbookCacheState _addressbookCacheState;
+	ABRecordRef _addressbookRecord;
 }
 
 @property (nonatomic, strong) NSDate * lastSync;
@@ -28,7 +36,7 @@ typedef enum {
 @property (nonatomic, strong) NSString * lastName;
 @property (nonatomic, strong) NSString * company;
 @property (nonatomic, strong) NSString * addressbookIdentifier;
-@property (nonatomic) AddressbookCacheState addressbookCacheState;
+@property (nonatomic) AddressbookCacheState _addressbookCacheState;
 @property (nonatomic) BOOL isCompany;
 @property (nonatomic) int16_t syncStatus;
 
@@ -38,5 +46,6 @@ typedef enum {
 + (Contact *)findContactForRecordId:(ABRecordID)recordId;
 - (ABRecordRef)findAddressbookRecord;
 - (BOOL)isContactOlderThanAddressbookRecord:(ABRecordRef)record;
+- (AddressbookResyncResults)syncAddressbookRecord;
 
 @end
