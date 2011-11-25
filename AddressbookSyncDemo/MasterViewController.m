@@ -205,10 +205,21 @@
 {
 	Contact *selectedObject = [[self fetchedResultsController] objectAtIndexPath:indexPath];
 	
-	if ([selectedObject findAddressbookRecord] == NULL) {
+	if (selectedObject.addressbookRecord == NULL) {
 		// Somthing is wrong, lets try to resolve it
-		if ([selectedObject syncAddressbookRecord] == kAddressbookSyncAmbigousResults) {
-			[[[UIAlertView alloc] initWithTitle:@"Ambigous Results" message:@"Ambigous contact results found during sync" completionBlock:^(NSUInteger buttonIndex) {
+		if (selectedObject.addressbookCacheState == kAddressbookCacheLoadFailed) {
+			[[[UIAlertView alloc] initWithTitle:@"Unmatched contact Details" message:@"The contact failed to match with address book entry" completionBlock:^(NSUInteger buttonIndex) {
+				switch(buttonIndex) {
+					case 0: // Cancelled
+						NSLog(@"Button 1");
+						break;
+					case 1: // Resolve Now
+						NSLog(@"Button 2");
+						break;
+				}
+			} cancelButtonTitle:@"Later" otherButtonTitles:@"Resolve Now"] show];
+		} else if (selectedObject.addressbookCacheState == kAddressbookCacheLoadAmbigous) {
+			[[[UIAlertView alloc] initWithTitle:@"Ambigous Contact Details" message:@"The details for this contact are ambigous" completionBlock:^(NSUInteger buttonIndex) {
 				switch(buttonIndex) {
 					case 0: // Cancelled
 						NSLog(@"Button 1");
@@ -219,8 +230,18 @@
 				}
 			} cancelButtonTitle:@"Later" otherButtonTitles:@"Resolve Now"] show];
 		}
+		[self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+ 	} else {
+		UIViewController *personViewController = [ShowContactDetails viewControllerForDisplayingContact:selectedObject];
+		if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+			//self.detailViewController
+			UINavigationController *detailNavigationController = (UINavigationController *)[self.splitViewController.viewControllers lastObject];
+			detailNavigationController.viewControllers = [NSArray arrayWithObject:personViewController];
+		} else {
+			[self.navigationController pushViewController:personViewController animated:YES];
+		}
 	}
-	
+/*
 	if ([selectedObject findAddressbookRecord] != NULL) {
 		UIViewController *personViewController = [ShowContactDetails viewControllerForDisplayingContact:selectedObject];
 		if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
@@ -241,6 +262,7 @@
 			[self performSegueWithIdentifier:@"noDetails" sender:self];
 		}
     }
+ */
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender

@@ -14,6 +14,7 @@ typedef enum {
 	kAddressbookCacheNotLoaded,
 	kAddressbookCacheCurrentlyLoading,
 	kAddressbookCacheLoadFailed,
+	kAddressbookCacheLoadAmbigous,
 	kAddressbookCacheLoaded
 } AddressbookCacheState;
 
@@ -28,8 +29,6 @@ extern NSString *kContactSyncStateChanged;
 
 @interface Contact : NSManagedObject {
 	AddressbookCacheState _addressbookCacheState;
-	ABRecordID _addressbookIdentifier;
-	ABRecordRef _addressbookRecord;
 }
 
 @property (nonatomic, strong) NSDate * lastSync;
@@ -38,8 +37,10 @@ extern NSString *kContactSyncStateChanged;
 @property (nonatomic, strong) NSString * company;
 @property (nonatomic) BOOL isCompany;
 @property (nonatomic) int16_t syncStatus;
-@property (nonatomic, readonly) ABRecordID addressbookIdentifier;
-@property (nonatomic, readonly) ABRecordRef addressbookRecord;
+@property (assign) ABRecordID addressbookIdentifier;
+@property (assign) ABRecordRef addressbookRecord;
+@property (nonatomic, readonly) AddressbookCacheState addressbookCacheState;
+
 @property (nonatomic, readonly) NSString *compositeName;
 
 + (Contact *)initContactWithAddressbookRecord:(ABRecordRef)record;

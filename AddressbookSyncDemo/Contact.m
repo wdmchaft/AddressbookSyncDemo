@@ -50,49 +50,58 @@ NSString *kContactSyncStateChanged = @"kContactSyncStateChanged";
 }
 
 - (void)saveRequest:(NSNotification *)notification {
-	if (_changed) {
-		NSURL *documentsDirectory = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
-		if (![_mappings writeToURL:[documentsDirectory URLByAppendingPathComponent:@"contactMapping.plist"] atomically:YES]) {
-			NSLog(@"Failed to write contactMapping.plist");
+	@synchronized(self) {
+		if (_changed) {
+			NSURL *documentsDirectory = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
+			if (![_mappings writeToURL:[documentsDirectory URLByAppendingPathComponent:@"contactMapping.plist"] atomically:YES]) {
+				NSLog(@"Failed to write contactMapping.plist");
+			} else {
+				NSLog(@"Contact Mappings saved");
+				_changed = NO;
+			}
 		} else {
-			NSLog(@"Contact Mappings saved");
-			_changed = NO;
+			NSLog(@"No contact mappings changes to save");
 		}
-	} else {
-		NSLog(@"No contact mappings changes to save");
 	}
 }
 
 - (NSString *)identifierForContact:(Contact *)contact {
-	NSString *key = [[contact.objectID URIRepresentation] absoluteString];
-	return [_mappings objectForKey:key];
+	@synchronized(self) {
+		NSString *key = [[contact.objectID URIRepresentation] absoluteString];
+		return [_mappings objectForKey:key];
+	}
 }
 
 - (void)setIdentifier:(NSString *)identifier forContact:(Contact *)contact {
-	NSMutableDictionary *newMappings = [NSMutableDictionary dictionaryWithDictionary:_mappings];
 	NSString *key = [[contact.objectID URIRepresentation] absoluteString];
-	[newMappings setObject:identifier forKey:key];
-	_mappings = [NSDictionary dictionaryWithDictionary:newMappings];
+	@synchronized(self) {
+		NSMutableDictionary *newMappings = [NSMutableDictionary dictionaryWithDictionary:_mappings];
+		[newMappings setObject:identifier forKey:key];
+		_mappings = [NSDictionary dictionaryWithDictionary:newMappings];
+	}
 	_changed = YES;
 }
 
 - (void)removeIdentifierForContact:(Contact *)contact {
-	NSMutableDictionary *newMappings = [NSMutableDictionary dictionaryWithDictionary:_mappings];
 	NSString *key = [[contact.objectID URIRepresentation] absoluteString];
-	[newMappings removeObjectForKey:key];
-	_mappings = [NSDictionary dictionaryWithDictionary:newMappings];
+	@synchronized(self) {
+		NSMutableDictionary *newMappings = [NSMutableDictionary dictionaryWithDictionary:_mappings];
+		[newMappings removeObjectForKey:key];
+		_mappings = [NSDictionary dictionaryWithDictionary:newMappings];
+	}
 	_changed = YES;
 }
 
 - (BOOL)contactExistsForIdentifier:(NSString *)identifier {
-	return [[_mappings allValues] containsObject:identifier];
+	@synchronized(self) {
+		return [[_mappings allValues] containsObject:identifier];
+	}
 }
 
 @end
 
 @interface Contact (private)
-@property (nonatomic, assign) ABRecordID addressbookIdentifier;
-@property (nonatomic, assign) ABRecordRef addressbookRecord;
++ (NSOperationQueue *)sharedOperationQueue;
 - (void)updateManagedObjectWithAddressbookRecordDetails;
 @end
 
@@ -127,28 +136,49 @@ NSString *kContactSyncStateChanged = @"kContactSyncStateChanged";
 	return [results anyObject];
 }
 
++ (NSOperationQueue *)sharedOperationQueue {
+	static dispatch_once_t onceToken = 0;
+	__strong static NSOperationQueue *_operationQueue = nil;
+	dispatch_once(&onceToken, ^{
+		_operationQueue = [[NSOperationQueue alloc] init];
+	});
+	return _operationQueue;
+}
+
 - (void)awakeFromFetch {
 	[super awakeFromFetch];
 
-	NSLog(@"Contach has been initialiased, loading details from cache");
-	_addressbookIdentifier = (ABRecordID)[[[ContactMappingCache sharedInstance] identifierForContact:self] integerValue];
+	NSLog(@"Contact '%@' has been initialiased, loading details from cache", self.compositeName);
+	self.addressbookIdentifier = (ABRecordID)[[[ContactMappingCache sharedInstance] identifierForContact:self] integerValue];
 	_addressbookCacheState = kAddressbookCacheNotLoaded;
-	if (_addressbookIdentifier != 0) {
-		_addressbookRecord = ABAddressBookGetPersonWithRecordID(ABAddressBookCreate(), _addressbookIdentifier);
-		if (_addressbookRecord == nil) { // i.e. we couldn't find the record
-			NSLog(@"The value we had for addressbook identifier was incorrect (contact didn't exist)");
-			_addressbookIdentifier = 0;
+	if (self.addressbookIdentifier != 0) {
+		self.addressbookRecord = ABAddressBookGetPersonWithRecordID(ABAddressBookCreate(), self.addressbookIdentifier);
+		if (self.addressbookRecord == nil) { // i.e. we couldn't find the record
+			NSLog(@"The value we had for addressbook identifier was incorrect ('%@' didn't exist)", self.compositeName);
+			self.addressbookIdentifier = 0;
 			[[ContactMappingCache sharedInstance] removeIdentifierForContact:self];
 			[[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:kContactSyncStateChanged object:self  userInfo:[NSDictionary dictionaryWithObject:self forKey:NSUpdatedObjectsKey]]];
+			/*
+			[[Contact sharedOperationQueue] addOperationWithBlock:^{
+				[self syncAddressbookRecord];
+			}];
+			 */
+			[self syncAddressbookRecord];
 		} else {
-			if ([self isContactOlderThanAddressbookRecord:_addressbookRecord]) {
+			if ([self isContactOlderThanAddressbookRecord:self.addressbookRecord]) {
 				NSLog(@"Addressbook contact is newer, we need to update our cache");
 				[self updateManagedObjectWithAddressbookRecordDetails];
 			}
 			_addressbookCacheState = kAddressbookCacheLoaded;
+			NSLog(@"Contact '%@' loaded", self.compositeName);
 		}
 	} else {
-		NSLog(@"Contact has no identifier in the mapping yet");
+		NSLog(@"Contact '%@' has no identifier in the mapping yet", self.compositeName);
+		[[Contact sharedOperationQueue] addOperationWithBlock:^{
+			[self syncAddressbookRecord];
+		}];
+		
+//		[self syncAddressbookRecord];
 	}
 }
 
@@ -161,14 +191,14 @@ NSString *kContactSyncStateChanged = @"kContactSyncStateChanged";
 	if ([self isDeleted]) {
 		NSLog(@"Removing identifier from Contacts Mapping");
 		[[ContactMappingCache sharedInstance] removeIdentifierForContact:self];
-	} else if (_addressbookIdentifier) {
+	} else if (self.addressbookIdentifier) {
 		NSLog(@"Adding/Updating identifier in Contacts Mapping");
-		[[ContactMappingCache sharedInstance] setIdentifier:[NSString stringWithFormat:@"%d", _addressbookIdentifier] forContact:self];
+		[[ContactMappingCache sharedInstance] setIdentifier:[NSString stringWithFormat:@"%d", self.addressbookIdentifier] forContact:self];
 	}	
 }
 
-- (ABRecordID)addressbookIdentifier {
-	return _addressbookIdentifier;
+- (AddressbookCacheState)addressbookCacheState {
+	return _addressbookCacheState;
 }
 
 - (BOOL)isContactOlderThanAddressbookRecord:(ABRecordRef)record {
@@ -180,12 +210,12 @@ NSString *kContactSyncStateChanged = @"kContactSyncStateChanged";
 }
 
 - (ABRecordRef)findAddressbookRecord {
-	if (!_addressbookRecord) {
-		if (_addressbookIdentifier) {
-			_addressbookRecord = ABAddressBookGetPersonWithRecordID(ABAddressBookCreate(), _addressbookIdentifier);
-			if (_addressbookRecord == nil) { // i.e. we couldn't find the record
+	if (!self.addressbookRecord) {
+		if (self.addressbookIdentifier) {
+			self.addressbookRecord = ABAddressBookGetPersonWithRecordID(ABAddressBookCreate(), self.addressbookIdentifier);
+			if (self.addressbookRecord == nil) { // i.e. we couldn't find the record
 				NSLog(@"The value we had for addressbook identifier was incorrect (contact didn't exist)");
-				_addressbookIdentifier = 0;
+				self.addressbookIdentifier = 0;
 				[[ContactMappingCache sharedInstance] removeIdentifierForContact:self];
 				_addressbookCacheState = kAddressbookCacheNotLoaded;
 				[[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:kContactSyncStateChanged object:self  userInfo:[NSDictionary dictionaryWithObject:self forKey:NSUpdatedObjectsKey]]];
@@ -193,64 +223,93 @@ NSString *kContactSyncStateChanged = @"kContactSyncStateChanged";
 		}
 	}
 	
-	return _addressbookRecord;
+	return self.addressbookRecord;
 }
 
 - (AddressbookResyncResults)syncAddressbookRecord {
-	if (_addressbookIdentifier && _addressbookCacheState == kAddressbookCacheNotLoaded) {
-		_addressbookCacheState = kAddressbookCacheCurrentlyLoading;
-		NSLog(@"We need to look up the contact & attempt to sync with Addressbook");
-		NSArray *people = (__bridge_transfer NSArray *)ABAddressBookCopyArrayOfAllPeople(ABAddressBookCreate());
-		
-		// Filter out everyone who matches these properties & doesn't currently have a mapping to a existing Contact
-		NSArray *filteredPeople = [people filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary *bindings) {
-			NSString *firstName = (__bridge_transfer NSString *)ABRecordCopyValue((__bridge ABRecordRef)evaluatedObject, kABPersonFirstNameProperty);
-			NSString *lastName = (__bridge_transfer NSString *)ABRecordCopyValue((__bridge ABRecordRef)evaluatedObject, kABPersonLastNameProperty);
-			NSString *company = (__bridge_transfer NSString *)ABRecordCopyValue((__bridge ABRecordRef)evaluatedObject, kABPersonOrganizationProperty);
-			CFNumberRef personType = ABRecordCopyValue((__bridge ABRecordRef)evaluatedObject, kABPersonKindProperty);
-			BOOL isCompany = (personType == kABPersonKindOrganization);
+	@synchronized(self) {
+		if (!self.addressbookIdentifier && _addressbookCacheState == kAddressbookCacheNotLoaded) {
+			_addressbookCacheState = kAddressbookCacheCurrentlyLoading;
+			NSLog(@"We need to look up the contact & attempt to sync with Addressbook");
+			NSArray *people = (__bridge_transfer NSArray *)ABAddressBookCopyArrayOfAllPeople(ABAddressBookCreate());
 			
-			return (((!firstName && !self.firstName)|| [firstName isEqualToString:self.firstName])
-					&& ((!lastName && !self.lastName)|| [lastName isEqualToString:self.lastName])
-					&& ((!company && !self.company)|| [company isEqualToString:self.company])
-					&& isCompany == self.isCompany)
-			&& ![[ContactMappingCache sharedInstance] contactExistsForIdentifier:[NSString stringWithFormat:@"%d", ABRecordGetRecordID((__bridge ABRecordRef)evaluatedObject)]];
+			__block NSString *searchFirstName;
+			__block NSString *searchLastName;
+			__block NSString *searchCompany;
+			__block BOOL searchIsCompany;
 			
-		}]];
-		
-		NSUInteger count = [filteredPeople count];
-		
-		if (count == 0) {
-			NSLog(@"No match found for contact"); // %@", self.compositeName);
-			_addressbookCacheState = kAddressbookCacheLoadFailed;
-			return kAddressbookSyncMatchFailed;
-		} else if (count == 1) {
-			_addressbookIdentifier = ABRecordGetRecordID(_addressbookRecord);
-			_addressbookRecord = (__bridge ABRecordRef)[filteredPeople lastObject];
-			[[ContactMappingCache sharedInstance] setIdentifier:[NSString stringWithFormat:@"%d", _addressbookIdentifier] forContact:self];
-			[self updateManagedObjectWithAddressbookRecordDetails];
-			NSLog(@"Match on '%@' [%d]", (__bridge_transfer NSString *)ABRecordCopyCompositeName(_addressbookRecord), ABRecordGetRecordID(_addressbookRecord));
-			[[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:kContactSyncStateChanged object:self  userInfo:[NSDictionary dictionaryWithObject:self forKey:NSUpdatedObjectsKey]]];
-			return kAddressbookSyncMatchFound;
-		} else {
-			NSLog(@"Ambigous results found");			
-			ABRecordRef record;
-			for (NSUInteger i = 0; i < [filteredPeople count]; i++) {
-				record = (__bridge ABRecordRef)[filteredPeople objectAtIndex:i];
-				NSLog(@"Match on '%@' [%d]", (__bridge_transfer NSString *)ABRecordCopyCompositeName(record), ABRecordGetRecordID(record));
+			void (^setup)(void) = ^{
+				searchFirstName = self.firstName;
+				searchLastName = self.lastName;
+				searchCompany = self.company;
+				searchIsCompany = self.isCompany;
+			};
+			
+			if ([NSOperationQueue mainQueue] != [NSOperationQueue currentQueue]) {
+				[[NSOperationQueue mainQueue] addOperationWithBlock:setup];
+				[[NSOperationQueue mainQueue] waitUntilAllOperationsAreFinished];
+			} else {
+				setup();
 			}
-			_addressbookCacheState = kAddressbookCacheLoadFailed;
-			[[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:kContactSyncStateChanged object:self  userInfo:[NSDictionary dictionaryWithObject:self forKey:NSUpdatedObjectsKey]]];
-			return kAddressbookSyncAmbigousResults;
+
+			// Filter out everyone who matches these properties & doesn't currently have a mapping to a existing Contact
+			NSArray *filteredPeople = [people filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary *bindings) {
+				NSString *firstName = (__bridge_transfer NSString *)ABRecordCopyValue((__bridge ABRecordRef)evaluatedObject, kABPersonFirstNameProperty);
+				NSString *lastName = (__bridge_transfer NSString *)ABRecordCopyValue((__bridge ABRecordRef)evaluatedObject, kABPersonLastNameProperty);
+				NSString *company = (__bridge_transfer NSString *)ABRecordCopyValue((__bridge ABRecordRef)evaluatedObject, kABPersonOrganizationProperty);
+				CFNumberRef personType = ABRecordCopyValue((__bridge ABRecordRef)evaluatedObject, kABPersonKindProperty);
+				BOOL isCompany = (personType == kABPersonKindOrganization);
+				
+				return (((!firstName && !searchFirstName)|| [firstName isEqualToString:searchFirstName])
+						&& ((!lastName && !searchLastName)|| [lastName isEqualToString:searchLastName])
+						&& ((!company && !searchCompany)|| [company isEqualToString:searchCompany])
+						&& isCompany == searchIsCompany)
+				&& ![[ContactMappingCache sharedInstance] contactExistsForIdentifier:[NSString stringWithFormat:@"%d", ABRecordGetRecordID((__bridge ABRecordRef)evaluatedObject)]];
+				
+			}]];
+			
+			NSUInteger count = [filteredPeople count];
+			
+			if (count == 0) {
+				NSLog(@"No match found for '%@'", self.compositeName);
+				_addressbookCacheState = kAddressbookCacheLoadFailed;
+				return kAddressbookSyncMatchFailed;
+			} else if (count == 1) {
+				self.addressbookRecord = (__bridge ABRecordRef)[filteredPeople lastObject];
+				self.addressbookIdentifier = ABRecordGetRecordID(self.addressbookRecord);
+				[[ContactMappingCache sharedInstance] setIdentifier:[NSString stringWithFormat:@"%d", self.addressbookIdentifier] forContact:self];
+				// we need to update our managed object back on the main thread
+				if ([NSOperationQueue mainQueue] != [NSOperationQueue currentQueue]) {
+					[[NSOperationQueue mainQueue] addOperationWithBlock:^{
+						[self updateManagedObjectWithAddressbookRecordDetails];
+					}];
+					[[NSOperationQueue mainQueue] waitUntilAllOperationsAreFinished];
+				} else {
+					[self updateManagedObjectWithAddressbookRecordDetails];
+				}
+				NSLog(@"Match on '%@' [%d]", (__bridge_transfer NSString *)ABRecordCopyCompositeName(self.addressbookRecord), ABRecordGetRecordID(self.addressbookRecord));
+				[[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:kContactSyncStateChanged object:self  userInfo:[NSDictionary dictionaryWithObject:self forKey:NSUpdatedObjectsKey]]];
+				return kAddressbookSyncMatchFound;
+			} else {
+				NSLog(@"Ambigous results found");			
+				ABRecordRef record;
+				for (NSUInteger i = 0; i < [filteredPeople count]; i++) {
+					record = (__bridge ABRecordRef)[filteredPeople objectAtIndex:i];
+					NSLog(@"Match on '%@' [%d]", (__bridge_transfer NSString *)ABRecordCopyCompositeName(record), ABRecordGetRecordID(record));
+				}
+				_addressbookCacheState = kAddressbookCacheLoadAmbigous;
+				[[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:kContactSyncStateChanged object:self  userInfo:[NSDictionary dictionaryWithObject:self forKey:NSUpdatedObjectsKey]]];
+				return kAddressbookSyncAmbigousResults;
+			}
 		}
+		
+		return kAddressbookSyncNotRequired;
 	}
-	
-	return kAddressbookSyncNotRequired;
 }
 
 - (NSString *)compositeName {
-	if (_addressbookRecord != nil) {
-		return (__bridge_transfer NSString *)ABRecordCopyCompositeName(_addressbookRecord); 
+	if (self.addressbookRecord != nil) {
+		return (__bridge_transfer NSString *)ABRecordCopyCompositeName(self.addressbookRecord); 
 	} else {
 		if (self.isCompany) {
 			return self.company;
@@ -268,17 +327,17 @@ NSString *kContactSyncStateChanged = @"kContactSyncStateChanged";
 
 - (void)updateManagedObjectWithAddressbookRecordDetails {
 	
-	if (_addressbookRecord == 0) {
+	if (self.addressbookRecord == 0) {
 		NSLog(@"Can't update record, object's _addressbookRecord is nil");
 		return;
 	}
 	
-	CFStringRef firstName = ABRecordCopyValue(_addressbookRecord, kABPersonFirstNameProperty);
-	CFStringRef lastName = ABRecordCopyValue(_addressbookRecord, kABPersonLastNameProperty);
-	CFStringRef company = ABRecordCopyValue(_addressbookRecord, kABPersonOrganizationProperty);
-	CFDateRef modificationDate = ABRecordCopyValue(_addressbookRecord, kABPersonModificationDateProperty);
+	CFStringRef firstName = ABRecordCopyValue(self.addressbookRecord, kABPersonFirstNameProperty);
+	CFStringRef lastName = ABRecordCopyValue(self.addressbookRecord, kABPersonLastNameProperty);
+	CFStringRef company = ABRecordCopyValue(self.addressbookRecord, kABPersonOrganizationProperty);
+	CFDateRef modificationDate = ABRecordCopyValue(self.addressbookRecord, kABPersonModificationDateProperty);
 	
-	CFNumberRef personType = ABRecordCopyValue(_addressbookRecord, kABPersonKindProperty);
+	CFNumberRef personType = ABRecordCopyValue(self.addressbookRecord, kABPersonKindProperty);
 	
 	self.isCompany = (personType == kABPersonKindOrganization);
 	CFRelease(personType);

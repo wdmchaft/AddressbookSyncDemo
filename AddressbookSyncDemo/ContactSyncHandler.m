@@ -24,11 +24,27 @@
 }
 
 - (void)iCloudMergeNotification:(NSNotification *)notification {
+	NSOperationQueue *addressbookSyncOperationQueue = [[NSOperationQueue alloc] init];
+	
 	for (NSManagedObject *object in [[notification userInfo] valueForKey:NSInsertedObjectsKey]) {
 		if ([object isKindOfClass:[Contact class]]) {
 			NSLog(@"Contact has been added as a result of a merge");
 			Contact *contact = (Contact *)object;
-			[contact syncAddressbookRecord];
+			NSBlockOperation *syncBlock = [NSBlockOperation blockOperationWithBlock:^{
+				[contact syncAddressbookRecord];
+			}];
+			
+			[syncBlock setCompletionBlock:^{
+				if ([addressbookSyncOperationQueue operationCount] == 0) {
+					NSLog(@"All iCloud import tasks complete");
+					NSSet *unmatched = [[[notification userInfo] valueForKey:NSInsertedObjectsKey] filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"addressbookCacheState", kAddressbookCacheLoadFailed]];
+					NSSet *ambigous = [[[notification userInfo] valueForKey:NSInsertedObjectsKey] filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"addressbookCacheState", kAddressbookCacheLoadAmbigous]];
+					
+					NSLog(@"Unmatched: %d Ambigous: %d", [unmatched count], [ambigous count]);
+				}
+			}];
+			
+			[addressbookSyncOperationQueue addOperation:syncBlock];
 		}
 	}
 

@@ -114,6 +114,9 @@
             [moc setPersistentStoreCoordinator: coordinator];
             [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(mergeChangesFrom_iCloud:) name:NSPersistentStoreDidImportUbiquitousContentChangesNotification object:coordinator];
         }];
+		
+#warning We ideally don't want this....
+		[__managedObjectContext setMergePolicy:NSMergeByPropertyStoreTrumpMergePolicy];
         __managedObjectContext = moc;
     }
 	
@@ -180,11 +183,11 @@
 		if (cloudURL == nil) {
 			NSLog(@"iCloud isn't enabled on this device");
 		}
-        NSString* coreDataCloudContent = [[cloudURL path] stringByAppendingPathComponent:@"AddressbookSyncDemo_v2"];
+        NSString* coreDataCloudContent = [[cloudURL path] stringByAppendingPathComponent:@"AddressbookSyncDemo_v3"];
         cloudURL = [NSURL fileURLWithPath:coreDataCloudContent];
 		
 		//  The API to turn on Core Data iCloud support here.
-        NSDictionary* options = [NSDictionary dictionaryWithObjectsAndKeys:@"com.tomfewster.examples.addressbooksyncdemo.2", NSPersistentStoreUbiquitousContentNameKey, cloudURL, NSPersistentStoreUbiquitousContentURLKey, [NSNumber numberWithBool:YES], NSMigratePersistentStoresAutomaticallyOption, [NSNumber numberWithBool:YES], NSInferMappingModelAutomaticallyOption,nil];
+        NSDictionary* options = [NSDictionary dictionaryWithObjectsAndKeys:@"com.tomfewster.examples.addressbooksyncdemo.3", NSPersistentStoreUbiquitousContentNameKey, cloudURL, NSPersistentStoreUbiquitousContentURLKey, [NSNumber numberWithBool:YES], NSMigratePersistentStoresAutomaticallyOption, [NSNumber numberWithBool:YES], NSInferMappingModelAutomaticallyOption,nil];
 		
         NSError *error = nil;
 		
