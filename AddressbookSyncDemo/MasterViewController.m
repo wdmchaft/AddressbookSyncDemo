@@ -59,7 +59,8 @@
 - (IBAction)destroyCache:(id)sender {
 	for (Contact *contact in [[self fetchedResultsController] fetchedObjects]) {
 		[[ContactMappingCache sharedInstance] removeIdentifierForContact:contact];
-		contact.addressbookIdentifier = nil;
+#warning We should probably be able to do this?
+//		contact.addressbookIdentifier = nil;
 	}
 	
 	[self.tableView reloadData];
@@ -359,7 +360,7 @@
 {
     Contact *contact = [self.fetchedResultsController objectAtIndexPath:indexPath];
     cell.textLabel.text = [contact compositeName];
-	cell.detailTextLabel.text = contact.addressbookIdentifier?contact.addressbookIdentifier:@"Contact not found";
+	cell.detailTextLabel.text = contact.addressbookIdentifier?[NSString stringWithFormat:@"%d", contact.addressbookIdentifier]:@"Contact not found";
 }
 
 #pragma mark -

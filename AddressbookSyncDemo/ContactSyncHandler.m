@@ -28,7 +28,7 @@
 		if ([object isKindOfClass:[Contact class]]) {
 			NSLog(@"Contact has been added as a result of a merge");
 			Contact *contact = (Contact *)object;
-			contact.addressbookIdentifier = nil;
+			[contact syncAddressbookRecord];
 		}
 	}
 

@@ -28,6 +28,7 @@ extern NSString *kContactSyncStateChanged;
 
 @interface Contact : NSManagedObject {
 	AddressbookCacheState _addressbookCacheState;
+	ABRecordID _addressbookIdentifier;
 	ABRecordRef _addressbookRecord;
 }
 
@@ -35,17 +36,17 @@ extern NSString *kContactSyncStateChanged;
 @property (nonatomic, strong) NSString * firstName;
 @property (nonatomic, strong) NSString * lastName;
 @property (nonatomic, strong) NSString * company;
-@property (nonatomic, strong) NSString * addressbookIdentifier;
-@property (nonatomic) AddressbookCacheState _addressbookCacheState;
 @property (nonatomic) BOOL isCompany;
 @property (nonatomic) int16_t syncStatus;
-
+@property (nonatomic, readonly) ABRecordID addressbookIdentifier;
+@property (nonatomic, readonly) ABRecordRef addressbookRecord;
 @property (nonatomic, readonly) NSString *compositeName;
 
 + (Contact *)initContactWithAddressbookRecord:(ABRecordRef)record;
 + (Contact *)findContactForRecordId:(ABRecordID)recordId;
-- (ABRecordRef)findAddressbookRecord;
 - (BOOL)isContactOlderThanAddressbookRecord:(ABRecordRef)record;
+
+- (ABRecordRef)findAddressbookRecord;
 - (AddressbookResyncResults)syncAddressbookRecord;
 
 @end
