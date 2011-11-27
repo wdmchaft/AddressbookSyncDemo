@@ -29,6 +29,7 @@ extern NSString *kContactSyncStateChanged;
 
 @interface Contact : NSManagedObject {
 	AddressbookCacheState _addressbookCacheState;
+	NSArray *_ambigousPossibleMatches;
 }
 
 @property (nonatomic, strong) NSDate * lastSync;
@@ -40,8 +41,11 @@ extern NSString *kContactSyncStateChanged;
 @property (assign) ABRecordID addressbookIdentifier;
 @property (assign) ABRecordRef addressbookRecord;
 @property (nonatomic, readonly) AddressbookCacheState addressbookCacheState;
+@property (nonatomic, readonly) NSArray *ambigousContactMatches;
 
-@property (nonatomic, readonly) NSString *compositeName;
+
+@property (weak, nonatomic, readonly) NSString *compositeName;
+@property (weak, nonatomic, readonly) NSString *secondaryCompositeName;
 
 + (Contact *)initContactWithAddressbookRecord:(ABRecordRef)record;
 + (Contact *)findContactForRecordId:(ABRecordID)recordId;
@@ -49,5 +53,7 @@ extern NSString *kContactSyncStateChanged;
 
 - (ABRecordRef)findAddressbookRecord;
 - (AddressbookResyncResults)syncAddressbookRecord;
+
+- (void)resolveConflictWithAddressbookRecord:(ABRecordRef)record;
 
 @end

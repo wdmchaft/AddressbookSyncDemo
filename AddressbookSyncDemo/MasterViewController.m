@@ -13,6 +13,8 @@
 #import "AppDelegate.h"
 #import "ShowContactDetails.h"
 #import "UIAlertView+BlockExtensions.h"
+#import "AmbigousContactConflictResolverViewController.h"
+#import "UnmatchedContactConflictResolverViewController.h"
 
 ///////// START PRIVATE API //////////
 // This is really a private API store in the Contact class
@@ -215,6 +217,7 @@
 						break;
 					case 1: // Resolve Now
 						NSLog(@"Button 2");
+						[self performSegueWithIdentifier:@"UnmatchedContactConflictResolver" sender:selectedObject];
 						break;
 				}
 			} cancelButtonTitle:@"Later" otherButtonTitles:@"Resolve Now"] show];
@@ -225,6 +228,7 @@
 						NSLog(@"Button 1");
 						break;
 					case 1: // Resolve Now
+						[self performSegueWithIdentifier:@"AmbigousContactConflictResolver" sender:selectedObject];
 						NSLog(@"Button 2");
 						break;
 				}
@@ -267,11 +271,18 @@
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
+	NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
+	Contact *selectedObject = [[self fetchedResultsController] objectAtIndexPath:indexPath];
+
     if ([[segue identifier] isEqualToString:@"noDetails"]) {
-        NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
-        Contact *selectedObject = [[self fetchedResultsController] objectAtIndexPath:indexPath];
         [[segue destinationViewController] setDetailItem:selectedObject];
-    }
+    } else if ([[segue identifier] isEqualToString:@"AmbigousContactConflictResolver"]) {
+		AmbigousContactConflictResolverViewController *viewController = [[[segue destinationViewController] viewControllers] objectAtIndex:0];
+		viewController.contact = sender;
+    } else if ([[segue identifier] isEqualToString:@"UnmatchedContactConflictResolver"]) {
+		UnmatchedContactConflictResolverViewController *viewController = [[[segue destinationViewController] viewControllers] objectAtIndex:0];
+		viewController.contact = sender;
+	}
 }
 
 #pragma mark - Fetched results controller

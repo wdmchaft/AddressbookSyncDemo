@@ -212,7 +212,8 @@ NSString *kContactSyncStateChanged = @"kContactSyncStateChanged";
 - (ABRecordRef)findAddressbookRecord {
 	if (!self.addressbookRecord) {
 		if (self.addressbookIdentifier) {
-			self.addressbookRecord = ABAddressBookGetPersonWithRecordID(ABAddressBookCreate(), self.addressbookIdentifier);
+			ABAddressBookRef addressbook = ABAddressBookCreate();
+			self.addressbookRecord = ABAddressBookGetPersonWithRecordID(addressbook, self.addressbookIdentifier);
 			if (self.addressbookRecord == nil) { // i.e. we couldn't find the record
 				NSLog(@"The value we had for addressbook identifier was incorrect (contact didn't exist)");
 				self.addressbookIdentifier = 0;
@@ -220,6 +221,7 @@ NSString *kContactSyncStateChanged = @"kContactSyncStateChanged";
 				_addressbookCacheState = kAddressbookCacheNotLoaded;
 				[[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:kContactSyncStateChanged object:self  userInfo:[NSDictionary dictionaryWithObject:self forKey:NSUpdatedObjectsKey]]];
 			}
+			CFRelease(addressbook);
 		}
 	}
 	
@@ -229,9 +231,10 @@ NSString *kContactSyncStateChanged = @"kContactSyncStateChanged";
 - (AddressbookResyncResults)syncAddressbookRecord {
 	@synchronized(self) {
 		if (!self.addressbookIdentifier && _addressbookCacheState == kAddressbookCacheNotLoaded) {
+			ABAddressBookRef addressbook = ABAddressBookCreate();
 			_addressbookCacheState = kAddressbookCacheCurrentlyLoading;
 			NSLog(@"We need to look up the contact & attempt to sync with Addressbook");
-			NSArray *people = (__bridge_transfer NSArray *)ABAddressBookCopyArrayOfAllPeople(ABAddressBookCreate());
+			NSArray *people = (__bridge_transfer NSArray *)ABAddressBookCopyArrayOfAllPeople(addressbook);
 			
 			__block NSString *searchFirstName;
 			__block NSString *searchLastName;
@@ -288,7 +291,6 @@ NSString *kContactSyncStateChanged = @"kContactSyncStateChanged";
 					[self updateManagedObjectWithAddressbookRecordDetails];
 				}
 				NSLog(@"Match on '%@' [%d]", (__bridge_transfer NSString *)ABRecordCopyCompositeName(self.addressbookRecord), ABRecordGetRecordID(self.addressbookRecord));
-				[[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:kContactSyncStateChanged object:self  userInfo:[NSDictionary dictionaryWithObject:self forKey:NSUpdatedObjectsKey]]];
 				return kAddressbookSyncMatchFound;
 			} else {
 				NSLog(@"Ambigous results found");			
@@ -297,14 +299,23 @@ NSString *kContactSyncStateChanged = @"kContactSyncStateChanged";
 					record = (__bridge ABRecordRef)[filteredPeople objectAtIndex:i];
 					NSLog(@"Match on '%@' [%d]", (__bridge_transfer NSString *)ABRecordCopyCompositeName(record), ABRecordGetRecordID(record));
 				}
+				_ambigousPossibleMatches = filteredPeople;
 				_addressbookCacheState = kAddressbookCacheLoadAmbigous;
 				[[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:kContactSyncStateChanged object:self  userInfo:[NSDictionary dictionaryWithObject:self forKey:NSUpdatedObjectsKey]]];
 				return kAddressbookSyncAmbigousResults;
 			}
+			CFRelease(addressbook);
 		}
 		
 		return kAddressbookSyncNotRequired;
 	}
+}
+
+- (void)resolveConflictWithAddressbookRecord:(ABRecordRef)record {
+	self.addressbookRecord = record;
+	self.addressbookIdentifier = ABRecordGetRecordID(self.addressbookRecord);
+	[self updateManagedObjectWithAddressbookRecordDetails];
+	NSLog(@"Conflict for '%@' is now resolved", self.compositeName);
 }
 
 - (NSString *)compositeName {
@@ -323,6 +334,24 @@ NSString *kContactSyncStateChanged = @"kContactSyncStateChanged";
 			}
 		}
 	}
+}
+
+- (NSString *)secondaryCompositeName {
+	if (!self.isCompany) {
+		return self.company;
+	} else {
+		NSString *firstName = (self.firstName?self.firstName:@"");
+		NSString *lastName = (self.lastName?self.lastName:@"");
+		if (ABPersonGetCompositeNameFormat() == kABPersonCompositeNameFormatFirstNameFirst) {
+			return [NSString stringWithFormat:@"%@ %@", firstName, lastName];
+		} else {
+			return [NSString stringWithFormat:@"%@ %@", lastName, firstName];
+		}
+	}
+}
+
+- (NSArray *)ambigousContactMatches {
+	return _ambigousPossibleMatches;	
 }
 
 - (void)updateManagedObjectWithAddressbookRecordDetails {
