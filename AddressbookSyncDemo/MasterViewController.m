@@ -202,6 +202,11 @@
     return [self.fetchedResultsController sectionForSectionIndexTitle:title atIndex:index];
 }
 
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section { 
+    id <NSFetchedResultsSectionInfo> sectionInfo = [[self.fetchedResultsController sections] objectAtIndex:section];
+    return [sectionInfo name];
+}
+
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	Contact *selectedObject = [[self fetchedResultsController] objectAtIndexPath:indexPath];
@@ -303,9 +308,8 @@
     [fetchRequest setFetchBatchSize:20];
     
     // Edit the sort key as appropriate.
-    NSArray *sortDescriptors = [NSArray arrayWithObjects:[[NSSortDescriptor alloc] initWithKey:@"lastName" ascending:YES],
-								[[NSSortDescriptor alloc] initWithKey:@"firstName" ascending:YES],
-								[[NSSortDescriptor alloc] initWithKey:@"company" ascending:YES],
+    NSArray *sortDescriptors = [NSArray arrayWithObjects:[[NSSortDescriptor alloc] initWithKey:@"sortTag2" ascending:YES],
+								//[[NSSortDescriptor alloc] initWithKey:@"sortTag2" ascending:YES],
 								nil];
     
     [fetchRequest setSortDescriptors:sortDescriptors];
@@ -394,7 +398,7 @@
 {
     Contact *contact = [self.fetchedResultsController objectAtIndexPath:indexPath];
     cell.textLabel.text = [contact compositeName];
-	cell.detailTextLabel.text = contact.addressbookIdentifier?[NSString stringWithFormat:@"%d", contact.addressbookIdentifier]:@"Contact not found";
+	cell.detailTextLabel.text = contact.addressbookIdentifier?[NSString stringWithFormat:@"%d ['%@', '%@'] - '%@'", contact.addressbookIdentifier, contact.sortTag1, contact.sortTag2, contact.groupingIndexCharacter]:@"Contact not found";
 }
 
 #pragma mark -

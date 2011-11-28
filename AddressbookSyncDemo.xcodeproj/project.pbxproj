@@ -25,6 +25,8 @@
 		E27357D91483713E00BCE1BB /* _Contact.m in Sources */ = {isa = PBXBuildFile; fileRef = E27357D81483713E00BCE1BB /* _Contact.m */; };
 		E27357DA1483713E00BCE1BB /* _Contact.m in Sources */ = {isa = PBXBuildFile; fileRef = E27357D81483713E00BCE1BB /* _Contact.m */; };
 		E27357E71483812C00BCE1BB /* Contact.m in Sources */ = {isa = PBXBuildFile; fileRef = E27357E61483812C00BCE1BB /* Contact.m */; };
+		E27357EE148427AA00BCE1BB /* SelectContact.xib in Resources */ = {isa = PBXBuildFile; fileRef = E27357ED148427AA00BCE1BB /* SelectContact.xib */; };
+		E27357F21484285800BCE1BB /* SelectContactSheetController.m in Sources */ = {isa = PBXBuildFile; fileRef = E27357F11484285800BCE1BB /* SelectContactSheetController.m */; };
 		E2BB1DE0147D3CCC002263D0 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E2BB1DDF147D3CCC002263D0 /* UIKit.framework */; };
 		E2BB1DE2147D3CCC002263D0 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E2BB1DE1147D3CCC002263D0 /* Foundation.framework */; };
 		E2BB1DE4147D3CCC002263D0 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E2BB1DE3147D3CCC002263D0 /* CoreGraphics.framework */; };
@@ -71,6 +73,9 @@
 		E27357D81483713E00BCE1BB /* _Contact.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = _Contact.m; sourceTree = "<group>"; };
 		E27357E51483812C00BCE1BB /* Contact.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Contact.h; sourceTree = "<group>"; };
 		E27357E61483812C00BCE1BB /* Contact.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Contact.m; sourceTree = "<group>"; };
+		E27357ED148427AA00BCE1BB /* SelectContact.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SelectContact.xib; sourceTree = "<group>"; };
+		E27357F01484285800BCE1BB /* SelectContactSheetController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SelectContactSheetController.h; sourceTree = "<group>"; };
+		E27357F11484285800BCE1BB /* SelectContactSheetController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SelectContactSheetController.m; sourceTree = "<group>"; };
 		E2BB1DDB147D3CCC002263D0 /* AddressbookSyncDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AddressbookSyncDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E2BB1DDF147D3CCC002263D0 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		E2BB1DE1147D3CCC002263D0 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -143,6 +148,9 @@
 				E27357BD1482D7B700BCE1BB /* MainMenu.xib */,
 				E27357E51483812C00BCE1BB /* Contact.h */,
 				E27357E61483812C00BCE1BB /* Contact.m */,
+				E27357ED148427AA00BCE1BB /* SelectContact.xib */,
+				E27357F01484285800BCE1BB /* SelectContactSheetController.h */,
+				E27357F11484285800BCE1BB /* SelectContactSheetController.m */,
 			);
 			path = AddressbookSyncDemoMac;
 			sourceTree = "<group>";
@@ -351,6 +359,7 @@
 				E27357B31482D7B700BCE1BB /* InfoPlist.strings in Resources */,
 				E27357B91482D7B700BCE1BB /* Credits.rtf in Resources */,
 				E27357BF1482D7B700BCE1BB /* MainMenu.xib in Resources */,
+				E27357EE148427AA00BCE1BB /* SelectContact.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -378,6 +387,7 @@
 				E27357C91482D8C400BCE1BB /* NSManagedObjectContext+SearchExtensions.m in Sources */,
 				E27357DA1483713E00BCE1BB /* _Contact.m in Sources */,
 				E27357E71483812C00BCE1BB /* Contact.m in Sources */,
+				E27357F21484285800BCE1BB /* SelectContactSheetController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -460,7 +470,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
-				CLANG_ENABLE_OBJC_ARC = NO;
+				CLANG_ENABLE_OBJC_ARC = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
@@ -482,7 +492,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
-				CLANG_ENABLE_OBJC_ARC = NO;
+				CLANG_ENABLE_OBJC_ARC = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",

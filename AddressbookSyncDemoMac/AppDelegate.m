@@ -7,6 +7,7 @@
 //
 
 #import "AppDelegate.h"
+#import "Contact.h"
 
 @implementation AppDelegate
 
@@ -14,18 +15,14 @@
 @synthesize persistentStoreCoordinator = __persistentStoreCoordinator;
 @synthesize managedObjectModel = __managedObjectModel;
 @synthesize managedObjectContext = __managedObjectContext;
-
-- (void)dealloc
-{
-	[__persistentStoreCoordinator release];
-	[__managedObjectModel release];
-	[__managedObjectContext release];
-    [super dealloc];
-}
+@synthesize personView;
+@synthesize contactSelectionIndex;
+@synthesize arrayController;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
 	// Insert code here to initialize your application
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveAction:) name:NSApplicationWillResignActiveNotification object:nil];
 }
 
 /**
@@ -95,13 +92,13 @@
         }
     }
     
-    NSURL *url = [applicationFilesDirectory URLByAppendingPathComponent:@"AddressbookSyncDemo.storedata"];
-    NSPersistentStoreCoordinator *coordinator = [[[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:mom] autorelease];
+    NSURL *url = [applicationFilesDirectory URLByAppendingPathComponent:@"AddressbookSyncDemo.sqlite"];
+    NSPersistentStoreCoordinator *coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:mom];
     if (![coordinator addPersistentStoreWithType:NSXMLStoreType configuration:nil URL:url options:nil error:&error]) {
         [[NSApplication sharedApplication] presentError:error];
         return nil;
     }
-    __persistentStoreCoordinator = [coordinator retain];
+    __persistentStoreCoordinator = coordinator;
 
     return __persistentStoreCoordinator;
 }
@@ -182,7 +179,7 @@
         NSString *info = NSLocalizedString(@"Quitting now will lose any changes you have made since the last successful save", @"Quit without saves error question info");
         NSString *quitButton = NSLocalizedString(@"Quit anyway", @"Quit anyway button title");
         NSString *cancelButton = NSLocalizedString(@"Cancel", @"Cancel button title");
-        NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+        NSAlert *alert = [[NSAlert alloc] init];
         [alert setMessageText:question];
         [alert setInformativeText:info];
         [alert addButtonWithTitle:quitButton];
@@ -196,6 +193,16 @@
     }
 
     return NSTerminateNow;
+}
+
+- (void)setContactSelectionIndex:(NSIndexSet *)value {
+	contactSelectionIndex = value;
+	//[_contactSelectionIndex firstIndex];
+	if ([arrayController selectedObjects] && [[arrayController selectedObjects] count] != 0) {
+		Contact *contact = [[arrayController selectedObjects] objectAtIndex:0];
+		[contact firstName];
+		[personView setPerson:(ABPerson *)contact.addressbookRecord];
+	}
 }
 
 @end

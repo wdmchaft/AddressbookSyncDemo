@@ -10,115 +10,6 @@
 
 NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 
-@implementation ContactMappingCache
-
-+ (ContactMappingCache *)sharedInstance {
-	static dispatch_once_t onceToken = 0;
-	__strong static id _sharedObject = nil;
-	dispatch_once(&onceToken, ^{
-		_sharedObject = [[ContactMappingCache alloc] init];
-	});
-	return _sharedObject;
-}
-
-- (id)init {
-	if (self = [super init]) {
-		NSURL *documentsDirectory = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
-		_mappings = [NSDictionary dictionaryWithContentsOfURL:[documentsDirectory URLByAppendingPathComponent:@"contactMapping.plist"]];
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveRequest:) name:NSManagedObjectContextDidSaveNotification object:nil];
-#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveRequest:) name:UIApplicationWillResignActiveNotification object:nil];
-#else
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveRequest:) name:NSApplicationWillResignActiveNotification object:nil];
-#endif
-	}
-	return self;
-}
-
-- (void)dealloc {
-	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:nil];
-#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-	[[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillResignActiveNotification object:nil];
-#else
-	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationWillResignActiveNotification object:nil];
-#endif
-}
-
-- (void)saveRequest:(NSNotification *)notification {
-	@synchronized(self) {
-		if (_changed) {
-			NSURL *documentsDirectory = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
-			if (![_mappings writeToURL:[documentsDirectory URLByAppendingPathComponent:@"contactMapping.plist"] atomically:YES]) {
-				NSLog(@"Failed to write contactMapping.plist");
-			} else {
-				NSLog(@"Contact Mappings saved");
-				_changed = NO;
-			}
-		} else {
-			NSLog(@"No contact mappings changes to save");
-		}
-	}
-}
-
-- (NSString *)identifierForContact:(_Contact *)contact {
-	@synchronized(self) {
-		NSString *key = [[contact.objectID URIRepresentation] absoluteString];
-		return [_mappings objectForKey:key];
-	}
-}
-
-- (void)setIdentifier:(NSString *)identifier forContact:(_Contact *)contact {
-	NSString *key = [[contact.objectID URIRepresentation] absoluteString];
-	@synchronized(self) {
-		NSMutableDictionary *newMappings = [NSMutableDictionary dictionaryWithDictionary:_mappings];
-		[newMappings setObject:identifier forKey:key];
-		_mappings = [NSDictionary dictionaryWithDictionary:newMappings];
-	}
-	_changed = YES;
-}
-
-- (void)removeIdentifierForContact:(_Contact *)contact {
-	NSString *key = [[contact.objectID URIRepresentation] absoluteString];
-	@synchronized(self) {
-		NSMutableDictionary *newMappings = [NSMutableDictionary dictionaryWithDictionary:_mappings];
-		[newMappings removeObjectForKey:key];
-		_mappings = [NSDictionary dictionaryWithDictionary:newMappings];
-	}
-	_changed = YES;
-}
-
-- (BOOL)contactExistsForIdentifier:(NSString *)identifier {
-	@synchronized(self) {
-		return [[_mappings allValues] containsObject:identifier];
-	}
-}
-
-- (_Contact *)contactObjectForIdentifier:(NSString *)identifier {
-	if ([self contactExistsForIdentifier:identifier]) {
-		@synchronized(self) {
-			for (NSString *urlAsString in [_mappings allKeys]) {
-				if ([[_mappings valueForKey:urlAsString] isEqualToString:identifier]) {
-					NSError *error = nil;
-					NSURL *objectURL = [NSURL URLWithString:urlAsString];
-					if (objectURL) {
-						NSManagedObjectID *objectId = [[MANAGED_OBJECT_CONTEXT persistentStoreCoordinator] managedObjectIDForURIRepresentation:objectURL];
-						if (objectId) {
-							_Contact *contact = (_Contact *)[MANAGED_OBJECT_CONTEXT existingObjectWithID:objectId error:&error];
-							if (error) {
-								NSLog(@"Error retreiving object: %@", [error localizedDescription]);
-							}
-							return contact;
-						}
-					}
-				}
-			}
-		}
-	}
-	return nil;
-}
-
-@end
-
 @implementation _Contact
 
 @dynamic lastSync;
@@ -145,6 +36,35 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 	return _operationQueue;
 }
 
+#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
++ (ABAddressBookRef)sharedAddressbook {
+	static dispatch_once_t onceToken = 0;
+	static ABAddressBookRef _addressbook = nil;
+	dispatch_once(&onceToken, ^{
+		_addressbook = ABAddressBookCreate();
+	});
+	return _addressbook;
+}
+#else
++ (ABAddressBook *)sharedAddressbook {
+	static dispatch_once_t onceToken = 0;
+	__strong static ABAddressBook *_addressbook = nil;
+	dispatch_once(&onceToken, ^{
+		_addressbook = [ABAddressBook addressBook];
+	});
+	return _addressbook;
+}
+#endif
+
++ (NSSet *)keyPathsForValuesAffectingValueForKey:(NSString *)key {
+	if ([key isEqualToString:@"compositeName"]) {
+		return [NSSet setWithObjects:@"firstName", @"lastName", @"comapny", nil];
+	} else if ([key isEqualToString:@"secondaryCompositeName"]) {
+		return [NSSet setWithObjects:@"firstName", @"lastName", @"comapny", nil];
+	}
+	
+	return nil;
+}
 
 + (Contact *)findContactForRecordId:(AddressbookRecordIdentifier)recordId {
 	NSString *addressbookIdentifier = [NSString stringWithFormat:@"%d", recordId];
@@ -155,14 +75,8 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 	[super awakeFromFetch];
 	
 	NSLog(@"Contact '%@' has been initialiased, loading details from cache", self.compositeName);
-	self.addressbookIdentifier = (AddressbookRecordIdentifier)[[[ContactMappingCache sharedInstance] identifierForContact:self] integerValue];
 	_addressbookCacheState = kAddressbookCacheNotLoaded;
 	if (self.addressbookIdentifier != 0) {
-#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-		self.addressbookRecord = ABAddressBookGetPersonWithRecordID(ABAddressBookCreate(), self.addressbookIdentifier);
-#else
-		self.addressbookRecord = [[ABAddressBook sharedAddressBook] recordForUniqueId:self.addressbookIdentifier];
-#endif
 		if (self.addressbookRecord == nil) { // i.e. we couldn't find the record
 			NSLog(@"The value we had for addressbook identifier was incorrect ('%@' didn't exist)", self.compositeName);
 			self.addressbookIdentifier = 0;
@@ -179,11 +93,12 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 		}
 	} else {
 		NSLog(@"Contact '%@' has no identifier in the mapping yet", self.compositeName);
+
 		[[_Contact sharedOperationQueue] addOperationWithBlock:^{
 			[(NSObject<Contact> *)self syncAddressbookRecord];
 		}];
-		
-		//		[self syncAddressbookRecord];
+
+		//[(NSObject<Contact> *)self syncAddressbookRecord];
 	}
 }
 
@@ -204,6 +119,26 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 
 - (AddressbookCacheState)addressbookCacheState {
 	return _addressbookCacheState;
+}
+
+- (AddressbookRecordIdentifier)addressbookIdentifier {
+	if (addressbookIdentifier == 0) {
+#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+		addressbookIdentifier = (AddressbookRecordIdentifier)[[[ContactMappingCache sharedInstance] identifierForContact:self] integerValue];
+#else
+		addressbookIdentifier = (AddressbookRecordIdentifier)[[ContactMappingCache sharedInstance] identifierForContact:self];
+#endif
+	}
+	return addressbookIdentifier;
+}
+
+
+- (AddressbookRecord)addressbookRecord {
+#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+	return ABAddressBookGetPersonWithRecordID([_Contact sharedAddressbook], self.addressbookIdentifier);
+#else
+	return [[_Contact sharedAddressbook] recordForUniqueId:self.addressbookIdentifier];
+#endif
 }
 
 - (NSArray *)ambigousContactMatches {
@@ -296,6 +231,114 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 	[self setPrimitiveValue:company forKey:@"company"];
 	[self didChangeValueForKey:@"company"];	
 	[self resetSearchTags];
+}
+
+@end
+
+
+@implementation ContactMappingCache
+
++ (ContactMappingCache *)sharedInstance {
+	static dispatch_once_t onceToken = 0;
+	__strong static id _sharedObject = nil;
+	dispatch_once(&onceToken, ^{
+		_sharedObject = [[ContactMappingCache alloc] init];
+	});
+	return _sharedObject;
+}
+
+- (id)init {
+	if (self = [super init]) {
+		@synchronized(self) {
+			NSURL *documentsDirectory = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
+			_mappings = [NSDictionary dictionaryWithContentsOfURL:[documentsDirectory URLByAppendingPathComponent:@"contactMapping.plist"]];
+			[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveRequest:) name:NSManagedObjectContextDidSaveNotification object:nil];
+#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+			[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveRequest:) name:UIApplicationWillResignActiveNotification object:nil];
+#endif
+		}
+	}
+	return self;
+}
+
+- (void)dealloc {
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:nil];
+#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillResignActiveNotification object:nil];
+#endif
+}
+
+- (void)saveRequest:(NSNotification *)notification {
+	@synchronized(self) {
+		if (_changed) {
+			NSURL *documentsDirectory = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
+			if (![_mappings writeToURL:[documentsDirectory URLByAppendingPathComponent:@"contactMapping.plist"] atomically:YES]) {
+				NSLog(@"Failed to write contactMapping.plist");
+			} else {
+				NSLog(@"Contact Mappings saved");
+				_changed = NO;
+			}
+		} else {
+			NSLog(@"No contact mappings changes to save");
+		}
+	}
+}
+
+- (NSString *)identifierForContact:(_Contact *)contact {
+	@synchronized(self) {
+		NSString *key = [[contact.objectID URIRepresentation] absoluteString];
+		return [_mappings objectForKey:key];
+	}
+}
+
+- (void)setIdentifier:(NSString *)identifier forContact:(_Contact *)contact {
+	NSString *key = [[contact.objectID URIRepresentation] absoluteString];
+	@synchronized(self) {
+		NSMutableDictionary *newMappings = [NSMutableDictionary dictionaryWithDictionary:_mappings];
+		[newMappings setObject:identifier forKey:key];
+		_mappings = [NSDictionary dictionaryWithDictionary:newMappings];
+	}
+	_changed = YES;
+}
+
+- (void)removeIdentifierForContact:(_Contact *)contact {
+	NSString *key = [[contact.objectID URIRepresentation] absoluteString];
+	@synchronized(self) {
+		NSMutableDictionary *newMappings = [NSMutableDictionary dictionaryWithDictionary:_mappings];
+		[newMappings removeObjectForKey:key];
+		_mappings = [NSDictionary dictionaryWithDictionary:newMappings];
+	}
+	_changed = YES;
+}
+
+- (BOOL)contactExistsForIdentifier:(NSString *)identifier {
+	@synchronized(self) {
+		return [[_mappings allValues] containsObject:identifier];
+	}
+}
+
+- (_Contact *)contactObjectForIdentifier:(NSString *)identifier {
+	if ([self contactExistsForIdentifier:identifier]) {
+		@synchronized(self) {
+			for (NSString *urlAsString in [_mappings allKeys]) {
+				if ([[_mappings valueForKey:urlAsString] isEqualToString:identifier]) {
+					NSError *error = nil;
+					NSURL *objectURL = [NSURL URLWithString:urlAsString];
+					if (objectURL) {
+						NSManagedObjectID *objectId = [[MANAGED_OBJECT_CONTEXT persistentStoreCoordinator] managedObjectIDForURIRepresentation:objectURL];
+						if (objectId) {
+							_Contact *contact = (_Contact *)[MANAGED_OBJECT_CONTEXT existingObjectWithID:objectId error:&error];
+							if (error) {
+								NSLog(@"Error retreiving object: %@", [error localizedDescription]);
+							}
+							return contact;
+						}
+					}
+				}
+			}
+		}
+	}
+	return nil;
 }
 
 @end

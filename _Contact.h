@@ -74,8 +74,13 @@ extern NSString *kContactSyncStateChangedNotification;
 
 @property (weak, nonatomic, readonly) NSString *groupingIndexCharacter;
 
-@property (assign) AddressbookRecordIdentifier addressbookIdentifier;
-@property (assign) AddressbookRecord addressbookRecord;
+#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+@property (nonatomic, assign) AddressbookRecordIdentifier addressbookIdentifier;
+@property (nonatomic, readonly) AddressbookRecord addressbookRecord;
+#else
+@property (nonatomic, strong) AddressbookRecordIdentifier addressbookIdentifier;
+@property (nonatomic, readonly, weak) AddressbookRecord addressbookRecord;
+#endif
 
 + (_Contact *)findContactForRecordId:(AddressbookRecordIdentifier)recordId;
 + (NSOperationQueue *)sharedOperationQueue;
@@ -84,7 +89,7 @@ extern NSString *kContactSyncStateChangedNotification;
 
 @interface ContactMappingCache : NSObject {
 @private
-    NSDictionary *_mappings;
+    __strong NSDictionary *_mappings;
 	BOOL _changed;
 }
 + (ContactMappingCache *)sharedInstance;
@@ -92,4 +97,5 @@ extern NSString *kContactSyncStateChangedNotification;
 - (void)setIdentifier:(NSString *)identifier forContact:(_Contact *)contact;
 - (void)removeIdentifierForContact:(_Contact *)contact;
 - (BOOL)contactExistsForIdentifier:(NSString *)identifier;
+- (_Contact *)contactObjectForIdentifier:(NSString *)identifier;
 @end

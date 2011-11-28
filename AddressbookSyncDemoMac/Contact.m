@@ -15,7 +15,6 @@
 	// Add this contact to the Object Graph
 	Contact *contact = [NSEntityDescription insertNewObjectForEntityForName:@"Contact" inManagedObjectContext:MANAGED_OBJECT_CONTEXT];
 	contact.addressbookIdentifier = [record uniqueId];
-	contact.addressbookRecord = record;
 	[contact updateManagedObjectWithAddressbookRecordDetails];
 	
 	return contact;
@@ -30,7 +29,6 @@
 }
 
 - (void)resolveConflictWithAddressbookRecord:(AddressbookRecord)record {
-	self.addressbookRecord = record;
 	self.addressbookIdentifier = [self.addressbookRecord uniqueId];
 	[self updateManagedObjectWithAddressbookRecordDetails];
 	NSLog(@"Conflict for '%@' is now resolved", self.compositeName);
@@ -71,7 +69,7 @@
 	}
 	
 	NSInteger personFlags = [[self.addressbookRecord valueForProperty:kABPersonFlags] integerValue];
-	self.isCompany = !(personFlags && kABShowAsPerson);
+	self.isCompany = (personFlags & kABShowAsCompany);
 	
 	self.firstName = [self.addressbookRecord valueForProperty:kABFirstNameProperty];
 	self.lastName = [self.addressbookRecord valueForProperty:kABLastNameProperty];
@@ -88,10 +86,11 @@
 }
 
 - (AddressbookRecord)findAddressbookRecord {
+	AddressbookRecord record;
 	if (!self.addressbookRecord) {
 		if (self.addressbookIdentifier) {
-			self.addressbookRecord = [[ABAddressBook sharedAddressBook] recordForUniqueId:self.addressbookIdentifier];
-			if (self.addressbookRecord == nil) { // i.e. we couldn't find the record
+			record = [[ABAddressBook sharedAddressBook] recordForUniqueId:self.addressbookIdentifier];
+			if (record == nil) { // i.e. we couldn't find the record
 				NSLog(@"The value we had for addressbook identifier was incorrect (contact didn't exist)");
 				self.addressbookIdentifier = 0;
 				[[ContactMappingCache sharedInstance] removeIdentifierForContact:self];
@@ -101,7 +100,7 @@
 		}
 	}
 	
-	return self.addressbookRecord;
+	return record;
 }
 
 - (AddressbookResyncResults)syncAddressbookRecord {
@@ -141,7 +140,7 @@
 			// Filter out everyone who matches these properties & doesn't currently have a mapping to a existing Contact
 			NSArray *filteredPeople = [people filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary *bindings) {
 				NSInteger personFlags = [[(ABPerson *)evaluatedObject valueForProperty:kABPersonFlags] integerValue];
-				return (self.isCompany != (personFlags && kABShowAsPerson));
+				return (self.isCompany == (personFlags & kABShowAsCompany));
 			}]];
 			
 			NSUInteger count = [filteredPeople count];
@@ -151,8 +150,7 @@
 				_addressbookCacheState = kAddressbookCacheLoadFailed;
 				return kAddressbookSyncMatchFailed;
 			} else if (count == 1) {
-				self.addressbookRecord = [filteredPeople lastObject];
-				self.addressbookIdentifier = [self.addressbookRecord uniqueId];
+				self.addressbookIdentifier = [[filteredPeople lastObject] uniqueId];
 				[[ContactMappingCache sharedInstance] setIdentifier:[NSString stringWithFormat:@"%d", self.addressbookIdentifier] forContact:self];
 				// we need to update our managed object back on the main thread
 				if ([NSOperationQueue mainQueue] != [NSOperationQueue currentQueue]) {

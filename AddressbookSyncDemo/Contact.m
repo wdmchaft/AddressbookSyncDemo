@@ -16,7 +16,6 @@
 	// Add this contact to the Object Graph
 	Contact *contact = [NSEntityDescription insertNewObjectForEntityForName:@"Contact" inManagedObjectContext:MANAGED_OBJECT_CONTEXT];
 	contact.addressbookIdentifier = ABRecordGetRecordID(record);
-	contact.addressbookRecord = record;
 	[contact updateManagedObjectWithAddressbookRecordDetails];
 	
 	return contact;
@@ -31,11 +30,12 @@
 }
 
 - (ABRecordRef)findAddressbookRecord {
+	ABRecordRef record;
 	if (!self.addressbookRecord) {
 		if (self.addressbookIdentifier) {
 			ABAddressBookRef addressbook = ABAddressBookCreate();
-			self.addressbookRecord = ABAddressBookGetPersonWithRecordID(addressbook, self.addressbookIdentifier);
-			if (self.addressbookRecord == nil) { // i.e. we couldn't find the record
+			record = ABAddressBookGetPersonWithRecordID(addressbook, self.addressbookIdentifier);
+			if (record == nil) { // i.e. we couldn't find the record
 				NSLog(@"The value we had for addressbook identifier was incorrect (contact didn't exist)");
 				self.addressbookIdentifier = 0;
 				[[ContactMappingCache sharedInstance] removeIdentifierForContact:self];
@@ -46,7 +46,7 @@
 		}
 	}
 	
-	return self.addressbookRecord;
+	return record;
 }
 
 - (AddressbookResyncResults)syncAddressbookRecord {
@@ -99,8 +99,7 @@
 				_addressbookCacheState = kAddressbookCacheLoadFailed;
 				return kAddressbookSyncMatchFailed;
 			} else if (count == 1) {
-				self.addressbookRecord = (__bridge ABRecordRef)[filteredPeople lastObject];
-				self.addressbookIdentifier = ABRecordGetRecordID(self.addressbookRecord);
+				self.addressbookIdentifier = ABRecordGetRecordID((__bridge ABRecordRef)[filteredPeople lastObject]);
 				[[ContactMappingCache sharedInstance] setIdentifier:[NSString stringWithFormat:@"%d", self.addressbookIdentifier] forContact:self];
 				// we need to update our managed object back on the main thread
 				if ([NSOperationQueue mainQueue] != [NSOperationQueue currentQueue]) {
@@ -133,7 +132,6 @@
 }
 
 - (void)resolveConflictWithAddressbookRecord:(ABRecordRef)record {
-	self.addressbookRecord = record;
 	self.addressbookIdentifier = ABRecordGetRecordID(self.addressbookRecord);
 	[self updateManagedObjectWithAddressbookRecordDetails];
 	NSLog(@"Conflict for '%@' is now resolved", self.compositeName);
