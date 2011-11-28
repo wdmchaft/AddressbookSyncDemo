@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model name="" userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="872" systemVersion="11C74" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
+<model name="" userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="872" systemVersion="10K540" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
     <entity name="Contact" representedClassName="Contact" syncable="YES">
         <attribute name="company" optional="YES" attributeType="String" syncable="YES" isSyncIdentityProperty="YES"/>
         <attribute name="firstName" optional="YES" attributeType="String" syncable="YES" isSyncIdentityProperty="YES"/>
         <attribute name="isCompany" attributeType="Boolean" defaultValueString="NO" syncable="YES" isSyncIdentityProperty="YES"/>
         <attribute name="lastName" optional="YES" attributeType="String" syncable="YES" isSyncIdentityProperty="YES"/>
         <attribute name="lastSync" optional="YES" attributeType="Date"/>
-        <attribute name="syncStatus" optional="YES" attributeType="Integer 16" defaultValueString="0"/>
+        <attribute name="sortTag1" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="sortTag2" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Contact" positionX="261" positionY="189" width="128" height="135"/>
+        <element name="Contact" positionX="261" positionY="189" width="128" height="150"/>
     </elements>
 </model>

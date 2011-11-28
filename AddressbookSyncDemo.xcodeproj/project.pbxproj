@@ -585,6 +585,7 @@
 				E27357C51482D7B700BCE1BB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		E2BB1DD5147D3CCC002263D0 /* Build configuration list for PBXProject "AddressbookSyncDemo" */ = {
 			isa = XCConfigurationList;

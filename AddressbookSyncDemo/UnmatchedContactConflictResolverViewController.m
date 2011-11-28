@@ -94,8 +94,8 @@
 			}
 		}
 
-		result = [result substringWithRange:NSMakeRange([result rangeOfCharacterFromSet:[NSCharacterSet letterCharacterSet]].location, 0)];
-		NSMutableArray *array = [sectionIndexLetter objectForKey:[result uppercaseString]];
+		result = [[result substringWithRange:NSMakeRange([result rangeOfCharacterFromSet:[NSCharacterSet letterCharacterSet]].location, 1)] uppercaseString];
+		NSMutableArray *array = [sectionIndexLetter objectForKey:result];
 		if (!array) {
 			array = [NSMutableArray array];
 			[sectionIndexLetter setObject:array forKey:[result uppercaseString]];

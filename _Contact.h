@@ -49,6 +49,7 @@ extern NSString *kContactSyncStateChangedNotification;
 - (AddressbookRecord)findAddressbookRecord;
 - (AddressbookResyncResults)syncAddressbookRecord;
 - (void)resolveConflictWithAddressbookRecord:(AddressbookRecord)record;
+
 @end
 
 
@@ -62,13 +63,16 @@ extern NSString *kContactSyncStateChangedNotification;
 @property (nonatomic, strong) NSString * lastName;
 @property (nonatomic, strong) NSString * company;
 @property (nonatomic) BOOL isCompany;
-@property (nonatomic) int16_t syncStatus;
+@property (nonatomic, strong) NSString * sortTag1;
+@property (nonatomic, strong) NSString * sortTag2;
 
 @property (nonatomic, readonly) AddressbookCacheState addressbookCacheState;
 @property (nonatomic, readonly) NSArray *ambigousContactMatches;
 
 @property (weak, nonatomic, readonly) NSString *compositeName;
 @property (weak, nonatomic, readonly) NSString *secondaryCompositeName;
+
+@property (weak, nonatomic, readonly) NSString *groupingIndexCharacter;
 
 @property (assign) AddressbookRecordIdentifier addressbookIdentifier;
 @property (assign) AddressbookRecord addressbookRecord;

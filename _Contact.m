@@ -126,7 +126,8 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 @dynamic lastName;
 @dynamic company;
 @dynamic isCompany;
-@dynamic syncStatus;
+@dynamic sortTag1;
+@dynamic sortTag2;
 
 // These must be declared in the subclass
 @dynamic compositeName;
@@ -207,6 +208,94 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 
 - (NSArray *)ambigousContactMatches {
 	return _ambigousPossibleMatches;	
+}
+
+- (NSString *)groupingIndexCharacter {
+	NSString *result = nil;
+	if (self.isCompany) {
+		if (self.company) {
+			result = self.company;
+		} else if (self.lastName) {
+			result = self.lastName;
+		} else if (self.firstName) {
+			result = self.firstName;
+		} else {
+			result = @"N";
+		}
+	} else {
+		if (self.lastName) {
+			result = self.lastName;
+		} else if (self.firstName) {
+			result = self.firstName;
+		} else if (self.company) {
+			result = self.company;
+		} else {
+			result = @"N";
+		}
+	}
+	
+	return [[result substringWithRange:NSMakeRange([result rangeOfCharacterFromSet:[NSCharacterSet letterCharacterSet]].location, 1)] uppercaseString];
+}
+
+- (void)resetSearchTags {
+	NSRange range = [self.company rangeOfCharacterFromSet:[NSCharacterSet letterCharacterSet]];
+	NSString *c = [[self.company substringWithRange:NSMakeRange(range.location, [self.company length]-range.location)] uppercaseString];
+	range = [self.firstName rangeOfCharacterFromSet:[NSCharacterSet letterCharacterSet]];
+	NSString *f = [[self.firstName substringWithRange:NSMakeRange(range.location, [self.firstName length]-range.location)] uppercaseString];
+	range = [self.lastName rangeOfCharacterFromSet:[NSCharacterSet letterCharacterSet]];
+	NSString *l = [[self.lastName substringWithRange:NSMakeRange(range.location, [self.lastName length]-range.location)] uppercaseString];
+	if (self.isCompany) {
+		if (c) {
+			self.sortTag1 = c;
+			self.sortTag2 = c;
+		} else if (f) {
+			self.sortTag1 = f;
+			if (l) {
+				self.sortTag2 = l;
+			} else {
+				self.sortTag2 = f;
+			}
+		} else if (l) {
+			self.sortTag1 = l;
+			self.sortTag2 = l;
+		}
+	} else {
+		if (f) {
+			self.sortTag1 = f;
+			if (l) {
+				self.sortTag2 = l;
+			} else {
+				self.sortTag2 = f;
+			}
+		} else if (l) {
+			self.sortTag1 = l;
+			self.sortTag2 = l;
+		} else if (c) {
+			self.sortTag1 = c;
+			self.sortTag2 = c;
+		}
+	}
+}
+
+- (void)setFirstName:(NSString *)firstName {
+	[self willChangeValueForKey:@"firstName"];
+	[self setPrimitiveValue:firstName forKey:@"firstName"];
+	[self didChangeValueForKey:@"firstName"];
+	[self resetSearchTags];
+}
+
+- (void)setLastName:(NSString *)lastName {
+	[self willChangeValueForKey:@"lastName"];
+	[self setPrimitiveValue:lastName forKey:@"lastName"];
+	[self didChangeValueForKey:@"lastName"];
+	[self resetSearchTags];
+}
+
+- (void)setCompany:(NSString *)company {
+	[self willChangeValueForKey:@"company"];
+	[self setPrimitiveValue:company forKey:@"company"];
+	[self didChangeValueForKey:@"company"];	
+	[self resetSearchTags];
 }
 
 @end
