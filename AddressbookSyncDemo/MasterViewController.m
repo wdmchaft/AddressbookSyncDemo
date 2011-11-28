@@ -16,20 +16,6 @@
 #import "AmbigousContactConflictResolverViewController.h"
 #import "UnmatchedContactConflictResolverViewController.h"
 
-///////// START PRIVATE API //////////
-// This is really a private API store in the Contact class
-@interface ContactMappingCache : NSObject {
-@private
-    NSDictionary *_mappings;
-}
-+ (ContactMappingCache *)sharedInstance;
-- (NSString *)identifierForContact:(Contact *)contact;
-- (void)setIdentifier:(NSString *)identifier forContact:(Contact *)contact;
-- (void)removeIdentifierForContact:(Contact *)contact;
-@end
-
-///////// END PRIVATE API //////////
-
 @interface MasterViewController ()
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
 @end

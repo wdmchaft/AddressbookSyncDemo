@@ -14,14 +14,4 @@
 	#import <CoreData/CoreData.h>
 #endif
 
-#import "NSManagedObjectContext+SearchExtensions.h"
-#import "NSObject+BlockExtensions.h"
-#	if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-@protocol UIManagedObjectApplicationDelegate <UIApplicationDelegate>
-- (NSManagedObjectContext *)managedObjectContext;
-@end
-#		define UIApp [UIApplication sharedApplication]
-#		define MANAGED_OBJECT_CONTEXT [((NSObject<UIManagedObjectApplicationDelegate> *)[UIApp delegate]) managedObjectContext]
-#	else
-#		define MANAGED_OBJECT_CONTEXT [[NSApp delegate] managedObjectContext]
-#	endif
+#import "Global.h"

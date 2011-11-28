@@ -9,6 +9,23 @@
 /* Begin PBXBuildFile section */
 		E22A5A8614810C8C00485A50 /* AmbigousContactConflictResolverViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E22A5A8514810C8C00485A50 /* AmbigousContactConflictResolverViewController.m */; };
 		E27357A114817E7E00BCE1BB /* UnmatchedContactConflictResolverViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E27357A014817E7E00BCE1BB /* UnmatchedContactConflictResolverViewController.m */; };
+		E27357A91482D7B600BCE1BB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E27357A81482D7B600BCE1BB /* Cocoa.framework */; };
+		E27357B31482D7B700BCE1BB /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E27357B11482D7B700BCE1BB /* InfoPlist.strings */; };
+		E27357B51482D7B700BCE1BB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E27357B41482D7B700BCE1BB /* main.m */; };
+		E27357B91482D7B700BCE1BB /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = E27357B71482D7B700BCE1BB /* Credits.rtf */; };
+		E27357BC1482D7B700BCE1BB /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E27357BB1482D7B700BCE1BB /* AppDelegate.m */; };
+		E27357BF1482D7B700BCE1BB /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = E27357BD1482D7B700BCE1BB /* MainMenu.xib */; };
+		E27357C61482D84F00BCE1BB /* AddressbookSyncDemo.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = E2BB1DF9147D3CCC002263D0 /* AddressbookSyncDemo.xcdatamodeld */; };
+		E27357C81482D8BD00BCE1BB /* NSObject+BlockExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = E2BB1E11147D4480002263D0 /* NSObject+BlockExtensions.m */; };
+		E27357C91482D8C400BCE1BB /* NSManagedObjectContext+SearchExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = E2BB1E0F147D447F002263D0 /* NSManagedObjectContext+SearchExtensions.m */; };
+		E27357CB1482DC2500BCE1BB /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E27357CA1482DC2500BCE1BB /* AddressBook.framework */; };
+		E27357CD1482DC3A00BCE1BB /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E27357CC1482DC3900BCE1BB /* CoreData.framework */; };
+		E27357D21482DEC100BCE1BB /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E27357D11482DEC100BCE1BB /* Foundation.framework */; };
+		E27357D41482DEC800BCE1BB /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E27357D31482DEC800BCE1BB /* AppKit.framework */; };
+		E27357D51482DF5000BCE1BB /* Contact.m in Sources */ = {isa = PBXBuildFile; fileRef = E2BB1E0C147D3EAB002263D0 /* Contact.m */; };
+		E27357D91483713E00BCE1BB /* _Contact.m in Sources */ = {isa = PBXBuildFile; fileRef = E27357D81483713E00BCE1BB /* _Contact.m */; };
+		E27357DA1483713E00BCE1BB /* _Contact.m in Sources */ = {isa = PBXBuildFile; fileRef = E27357D81483713E00BCE1BB /* _Contact.m */; };
+		E27357E71483812C00BCE1BB /* Contact.m in Sources */ = {isa = PBXBuildFile; fileRef = E27357E61483812C00BCE1BB /* Contact.m */; };
 		E2BB1DE0147D3CCC002263D0 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E2BB1DDF147D3CCC002263D0 /* UIKit.framework */; };
 		E2BB1DE2147D3CCC002263D0 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E2BB1DE1147D3CCC002263D0 /* Foundation.framework */; };
 		E2BB1DE4147D3CCC002263D0 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E2BB1DE3147D3CCC002263D0 /* CoreGraphics.framework */; };
@@ -36,6 +53,25 @@
 		E22A5A8514810C8C00485A50 /* AmbigousContactConflictResolverViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AmbigousContactConflictResolverViewController.m; sourceTree = "<group>"; };
 		E273579F14817E7E00BCE1BB /* UnmatchedContactConflictResolverViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UnmatchedContactConflictResolverViewController.h; sourceTree = "<group>"; };
 		E27357A014817E7E00BCE1BB /* UnmatchedContactConflictResolverViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UnmatchedContactConflictResolverViewController.m; sourceTree = "<group>"; };
+		E27357A61482D7B600BCE1BB /* AddressbookSyncDemoMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AddressbookSyncDemoMac.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E27357A81482D7B600BCE1BB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
+		E27357B01482D7B700BCE1BB /* AddressbookSyncDemoMac-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "AddressbookSyncDemoMac-Info.plist"; sourceTree = "<group>"; };
+		E27357B21482D7B700BCE1BB /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		E27357B41482D7B700BCE1BB /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		E27357B61482D7B700BCE1BB /* AddressbookSyncDemoMac-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AddressbookSyncDemoMac-Prefix.pch"; sourceTree = "<group>"; };
+		E27357B81482D7B700BCE1BB /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/Credits.rtf; sourceTree = "<group>"; };
+		E27357BA1482D7B700BCE1BB /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		E27357BB1482D7B700BCE1BB /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		E27357BE1482D7B700BCE1BB /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		E27357CA1482DC2500BCE1BB /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = SDKs/MacOSX10.7.sdk/System/Library/Frameworks/AddressBook.framework; sourceTree = DEVELOPER_DIR; };
+		E27357CC1482DC3900BCE1BB /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = SDKs/MacOSX10.7.sdk/System/Library/Frameworks/CoreData.framework; sourceTree = DEVELOPER_DIR; };
+		E27357D11482DEC100BCE1BB /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = SDKs/MacOSX10.7.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		E27357D31482DEC800BCE1BB /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = SDKs/MacOSX10.7.sdk/System/Library/Frameworks/AppKit.framework; sourceTree = DEVELOPER_DIR; };
+		E27357D61482E05F00BCE1BB /* Global.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Global.h; sourceTree = "<group>"; };
+		E27357D71483713E00BCE1BB /* _Contact.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _Contact.h; sourceTree = "<group>"; };
+		E27357D81483713E00BCE1BB /* _Contact.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = _Contact.m; sourceTree = "<group>"; };
+		E27357E51483812C00BCE1BB /* Contact.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Contact.h; sourceTree = "<group>"; };
+		E27357E61483812C00BCE1BB /* Contact.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Contact.m; sourceTree = "<group>"; };
 		E2BB1DDB147D3CCC002263D0 /* AddressbookSyncDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AddressbookSyncDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E2BB1DDF147D3CCC002263D0 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		E2BB1DE1147D3CCC002263D0 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -58,10 +94,10 @@
 		E2BB1E09147D3DB1002263D0 /* AddressBookUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBookUI.framework; path = System/Library/Frameworks/AddressBookUI.framework; sourceTree = SDKROOT; };
 		E2BB1E0B147D3EAB002263D0 /* Contact.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Contact.h; sourceTree = "<group>"; };
 		E2BB1E0C147D3EAB002263D0 /* Contact.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Contact.m; sourceTree = "<group>"; };
-		E2BB1E0E147D447E002263D0 /* NSManagedObjectContext+SearchExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSManagedObjectContext+SearchExtensions.h"; sourceTree = "<group>"; };
-		E2BB1E0F147D447F002263D0 /* NSManagedObjectContext+SearchExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSManagedObjectContext+SearchExtensions.m"; sourceTree = "<group>"; };
-		E2BB1E10147D447F002263D0 /* NSObject+BlockExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+BlockExtensions.h"; sourceTree = "<group>"; };
-		E2BB1E11147D4480002263D0 /* NSObject+BlockExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+BlockExtensions.m"; sourceTree = "<group>"; };
+		E2BB1E0E147D447E002263D0 /* NSManagedObjectContext+SearchExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSManagedObjectContext+SearchExtensions.h"; path = "AddressbookSyncDemo/NSManagedObjectContext+SearchExtensions.h"; sourceTree = "<group>"; };
+		E2BB1E0F147D447F002263D0 /* NSManagedObjectContext+SearchExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSManagedObjectContext+SearchExtensions.m"; path = "AddressbookSyncDemo/NSManagedObjectContext+SearchExtensions.m"; sourceTree = "<group>"; };
+		E2BB1E10147D447F002263D0 /* NSObject+BlockExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSObject+BlockExtensions.h"; path = "AddressbookSyncDemo/NSObject+BlockExtensions.h"; sourceTree = "<group>"; };
+		E2BB1E11147D4480002263D0 /* NSObject+BlockExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSObject+BlockExtensions.m"; path = "AddressbookSyncDemo/NSObject+BlockExtensions.m"; sourceTree = "<group>"; };
 		E2BB1E18147D58A7002263D0 /* AddressbookSyncDemo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = AddressbookSyncDemo.entitlements; sourceTree = "<group>"; };
 		E2BB1E19147D7E52002263D0 /* ShowContactDetails.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShowContactDetails.h; sourceTree = "<group>"; };
 		E2BB1E1A147D7E53002263D0 /* ShowContactDetails.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShowContactDetails.m; sourceTree = "<group>"; };
@@ -72,6 +108,18 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		E27357A31482D7B600BCE1BB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E27357D41482DEC800BCE1BB /* AppKit.framework in Frameworks */,
+				E27357D21482DEC100BCE1BB /* Foundation.framework in Frameworks */,
+				E27357CD1482DC3A00BCE1BB /* CoreData.framework in Frameworks */,
+				E27357CB1482DC2500BCE1BB /* AddressBook.framework in Frameworks */,
+				E27357A91482D7B600BCE1BB /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E2BB1DD8147D3CCC002263D0 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -88,12 +136,85 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		E2BB1DD0147D3CCC002263D0 = {
+		E27357AE1482D7B700BCE1BB /* AddressbookSyncDemoMac */ = {
+			isa = PBXGroup;
+			children = (
+				E27357BA1482D7B700BCE1BB /* AppDelegate.h */,
+				E27357BB1482D7B700BCE1BB /* AppDelegate.m */,
+				E27357BD1482D7B700BCE1BB /* MainMenu.xib */,
+				E27357E51483812C00BCE1BB /* Contact.h */,
+				E27357E61483812C00BCE1BB /* Contact.m */,
+			);
+			path = AddressbookSyncDemoMac;
+			sourceTree = "<group>";
+		};
+		E27357AF1482D7B700BCE1BB /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				E27357B01482D7B700BCE1BB /* AddressbookSyncDemoMac-Info.plist */,
+				E27357B11482D7B700BCE1BB /* InfoPlist.strings */,
+				E27357B41482D7B700BCE1BB /* main.m */,
+				E27357B61482D7B700BCE1BB /* AddressbookSyncDemoMac-Prefix.pch */,
+				E27357B71482D7B700BCE1BB /* Credits.rtf */,
+			);
+			name = "Supporting Files";
+			path = AddressbookSyncDemoMac;
+			sourceTree = "<group>";
+		};
+		E27357C71482D86B00BCE1BB /* Generic */ = {
+			isa = PBXGroup;
+			children = (
+				E2BB1E0E147D447E002263D0 /* NSManagedObjectContext+SearchExtensions.h */,
+				E2BB1E0F147D447F002263D0 /* NSManagedObjectContext+SearchExtensions.m */,
+				E2BB1E10147D447F002263D0 /* NSObject+BlockExtensions.h */,
+				E2BB1E11147D4480002263D0 /* NSObject+BlockExtensions.m */,
+				E2BB1DF9147D3CCC002263D0 /* AddressbookSyncDemo.xcdatamodeld */,
+				E27357D61482E05F00BCE1BB /* Global.h */,
+				E27357D71483713E00BCE1BB /* _Contact.h */,
+				E27357D81483713E00BCE1BB /* _Contact.m */,
+			);
+			name = Generic;
+			sourceTree = "<group>";
+		};
+		E27357CE1482DD1900BCE1BB /* iOS */ = {
 			isa = PBXGroup;
 			children = (
 				E2BB1DE7147D3CCC002263D0 /* AddressbookSyncDemo */,
 				E2BB1DE8147D3CCC002263D0 /* Supporting Files */,
 				E2BB1DDE147D3CCC002263D0 /* Frameworks */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
+		E27357CF1482DD7E00BCE1BB /* Mac */ = {
+			isa = PBXGroup;
+			children = (
+				E27357AE1482D7B700BCE1BB /* AddressbookSyncDemoMac */,
+				E27357AF1482D7B700BCE1BB /* Supporting Files */,
+				E27357D01482DDE900BCE1BB /* Frameworks */,
+			);
+			name = Mac;
+			sourceTree = "<group>";
+		};
+		E27357D01482DDE900BCE1BB /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				E27357D31482DEC800BCE1BB /* AppKit.framework */,
+				E27357D11482DEC100BCE1BB /* Foundation.framework */,
+				E27357A81482D7B600BCE1BB /* Cocoa.framework */,
+				E27357CA1482DC2500BCE1BB /* AddressBook.framework */,
+				E27357CC1482DC3900BCE1BB /* CoreData.framework */,
+			);
+			name = Frameworks;
+			path = AddressbookSyncDemoMac;
+			sourceTree = "<group>";
+		};
+		E2BB1DD0147D3CCC002263D0 = {
+			isa = PBXGroup;
+			children = (
+				E27357C71482D86B00BCE1BB /* Generic */,
+				E27357CF1482DD7E00BCE1BB /* Mac */,
+				E27357CE1482DD1900BCE1BB /* iOS */,
 				E2BB1DDC147D3CCC002263D0 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -102,6 +223,7 @@
 			isa = PBXGroup;
 			children = (
 				E2BB1DDB147D3CCC002263D0 /* AddressbookSyncDemo.app */,
+				E27357A61482D7B600BCE1BB /* AddressbookSyncDemoMac.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -132,12 +254,6 @@
 				E2BB1DFD147D3CCC002263D0 /* MasterViewController.m */,
 				E2BB1DFF147D3CCC002263D0 /* DetailViewController.h */,
 				E2BB1E00147D3CCC002263D0 /* DetailViewController.m */,
-				E2BB1E0B147D3EAB002263D0 /* Contact.h */,
-				E2BB1E0C147D3EAB002263D0 /* Contact.m */,
-				E2BB1E0E147D447E002263D0 /* NSManagedObjectContext+SearchExtensions.h */,
-				E2BB1E0F147D447F002263D0 /* NSManagedObjectContext+SearchExtensions.m */,
-				E2BB1E10147D447F002263D0 /* NSObject+BlockExtensions.h */,
-				E2BB1E11147D4480002263D0 /* NSObject+BlockExtensions.m */,
 				E2BB1E19147D7E52002263D0 /* ShowContactDetails.h */,
 				E2BB1E1A147D7E53002263D0 /* ShowContactDetails.m */,
 				E2BB1E1C147D88E6002263D0 /* ContactSyncHandler.h */,
@@ -146,6 +262,8 @@
 				E22A5A8514810C8C00485A50 /* AmbigousContactConflictResolverViewController.m */,
 				E273579F14817E7E00BCE1BB /* UnmatchedContactConflictResolverViewController.h */,
 				E27357A014817E7E00BCE1BB /* UnmatchedContactConflictResolverViewController.m */,
+				E2BB1E0B147D3EAB002263D0 /* Contact.h */,
+				E2BB1E0C147D3EAB002263D0 /* Contact.m */,
 			);
 			path = AddressbookSyncDemo;
 			sourceTree = "<group>";
@@ -158,7 +276,6 @@
 				E2BB1DEA147D3CCC002263D0 /* InfoPlist.strings */,
 				E2BB1DED147D3CCC002263D0 /* main.m */,
 				E2BB1DEF147D3CCC002263D0 /* AddressbookSyncDemo-Prefix.pch */,
-				E2BB1DF9147D3CCC002263D0 /* AddressbookSyncDemo.xcdatamodeld */,
 			);
 			name = "Supporting Files";
 			path = AddressbookSyncDemo;
@@ -167,6 +284,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		E27357A51482D7B600BCE1BB /* AddressbookSyncDemoMac */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E27357C31482D7B700BCE1BB /* Build configuration list for PBXNativeTarget "AddressbookSyncDemoMac" */;
+			buildPhases = (
+				E27357A21482D7B600BCE1BB /* Sources */,
+				E27357A31482D7B600BCE1BB /* Frameworks */,
+				E27357A41482D7B600BCE1BB /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = AddressbookSyncDemoMac;
+			productName = AddressbookSyncDemoMac;
+			productReference = E27357A61482D7B600BCE1BB /* AddressbookSyncDemoMac.app */;
+			productType = "com.apple.product-type.application";
+		};
 		E2BB1DDA147D3CCC002263D0 /* AddressbookSyncDemo */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = E2BB1E04147D3CCC002263D0 /* Build configuration list for PBXNativeTarget "AddressbookSyncDemo" */;
@@ -205,11 +339,22 @@
 			projectRoot = "";
 			targets = (
 				E2BB1DDA147D3CCC002263D0 /* AddressbookSyncDemo */,
+				E27357A51482D7B600BCE1BB /* AddressbookSyncDemoMac */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		E27357A41482D7B600BCE1BB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E27357B31482D7B700BCE1BB /* InfoPlist.strings in Resources */,
+				E27357B91482D7B700BCE1BB /* Credits.rtf in Resources */,
+				E27357BF1482D7B700BCE1BB /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E2BB1DD9147D3CCC002263D0 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -223,6 +368,21 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		E27357A21482D7B600BCE1BB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E27357B51482D7B700BCE1BB /* main.m in Sources */,
+				E27357BC1482D7B700BCE1BB /* AppDelegate.m in Sources */,
+				E27357C61482D84F00BCE1BB /* AddressbookSyncDemo.xcdatamodeld in Sources */,
+				E27357C81482D8BD00BCE1BB /* NSObject+BlockExtensions.m in Sources */,
+				E27357C91482D8C400BCE1BB /* NSManagedObjectContext+SearchExtensions.m in Sources */,
+				E27357D51482DF5000BCE1BB /* Contact.m in Sources */,
+				E27357DA1483713E00BCE1BB /* _Contact.m in Sources */,
+				E27357E71483812C00BCE1BB /* Contact.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E2BB1DD7147D3CCC002263D0 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -240,12 +400,37 @@
 				E2CD2488147F802100550386 /* UIAlertView+BlockExtensions.m in Sources */,
 				E22A5A8614810C8C00485A50 /* AmbigousContactConflictResolverViewController.m in Sources */,
 				E27357A114817E7E00BCE1BB /* UnmatchedContactConflictResolverViewController.m in Sources */,
+				E27357D91483713E00BCE1BB /* _Contact.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
+		E27357B11482D7B700BCE1BB /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				E27357B21482D7B700BCE1BB /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		E27357B71482D7B700BCE1BB /* Credits.rtf */ = {
+			isa = PBXVariantGroup;
+			children = (
+				E27357B81482D7B700BCE1BB /* en */,
+			);
+			name = Credits.rtf;
+			sourceTree = "<group>";
+		};
+		E27357BD1482D7B700BCE1BB /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				E27357BE1482D7B700BCE1BB /* en */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
 		E2BB1DEA147D3CCC002263D0 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -273,6 +458,50 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		E27357C41482D7B700BCE1BB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_ENABLE_OBJC_ARC = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
+				);
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "AddressbookSyncDemoMac/AddressbookSyncDemoMac-Prefix.pch";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				INFOPLIST_FILE = "AddressbookSyncDemoMac/AddressbookSyncDemoMac-Info.plist";
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		E27357C51482D7B700BCE1BB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_ENABLE_OBJC_ARC = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
+				);
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "AddressbookSyncDemoMac/AddressbookSyncDemoMac-Prefix.pch";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				INFOPLIST_FILE = "AddressbookSyncDemoMac/AddressbookSyncDemoMac-Info.plist";
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
 		E2BB1E02147D3CCC002263D0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -351,6 +580,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		E27357C31482D7B700BCE1BB /* Build configuration list for PBXNativeTarget "AddressbookSyncDemoMac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E27357C41482D7B700BCE1BB /* Debug */,
+				E27357C51482D7B700BCE1BB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		E2BB1DD5147D3CCC002263D0 /* Build configuration list for PBXProject "AddressbookSyncDemo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -378,7 +615,8 @@
 				E2BB1DFA147D3CCC002263D0 /* AddressbookSyncDemo.xcdatamodel */,
 			);
 			currentVersion = E2BB1DFA147D3CCC002263D0 /* AddressbookSyncDemo.xcdatamodel */;
-			path = AddressbookSyncDemo.xcdatamodeld;
+			name = AddressbookSyncDemo.xcdatamodeld;
+			path = AddressbookSyncDemo/AddressbookSyncDemo.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
 		};
