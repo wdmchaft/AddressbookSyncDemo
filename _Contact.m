@@ -145,9 +145,9 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 }
 
 
-+ (Contact *)findContactForRecordId:(ABRecordID)recordId {
++ (Contact *)findContactForRecordId:(AddressbookRecordIdentifier)recordId {
 	NSString *addressbookIdentifier = [NSString stringWithFormat:@"%d", recordId];
-	return [[ContactMappingCache sharedInstance] contactObjectForIdentifier:addressbookIdentifier];
+	return (Contact *)[[ContactMappingCache sharedInstance] contactObjectForIdentifier:addressbookIdentifier];
 }
 
 - (void)awakeFromFetch {
@@ -157,7 +157,11 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 	self.addressbookIdentifier = (AddressbookRecordIdentifier)[[[ContactMappingCache sharedInstance] identifierForContact:self] integerValue];
 	_addressbookCacheState = kAddressbookCacheNotLoaded;
 	if (self.addressbookIdentifier != 0) {
+#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 		self.addressbookRecord = ABAddressBookGetPersonWithRecordID(ABAddressBookCreate(), self.addressbookIdentifier);
+#else
+		self.addressbookRecord = [[ABAddressBook sharedAddressBook] recordForUniqueId:self.addressbookIdentifier];
+#endif
 		if (self.addressbookRecord == nil) { // i.e. we couldn't find the record
 			NSLog(@"The value we had for addressbook identifier was incorrect ('%@' didn't exist)", self.compositeName);
 			self.addressbookIdentifier = 0;

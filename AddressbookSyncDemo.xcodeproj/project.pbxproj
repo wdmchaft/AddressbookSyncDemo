@@ -22,7 +22,6 @@
 		E27357CD1482DC3A00BCE1BB /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E27357CC1482DC3900BCE1BB /* CoreData.framework */; };
 		E27357D21482DEC100BCE1BB /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E27357D11482DEC100BCE1BB /* Foundation.framework */; };
 		E27357D41482DEC800BCE1BB /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E27357D31482DEC800BCE1BB /* AppKit.framework */; };
-		E27357D51482DF5000BCE1BB /* Contact.m in Sources */ = {isa = PBXBuildFile; fileRef = E2BB1E0C147D3EAB002263D0 /* Contact.m */; };
 		E27357D91483713E00BCE1BB /* _Contact.m in Sources */ = {isa = PBXBuildFile; fileRef = E27357D81483713E00BCE1BB /* _Contact.m */; };
 		E27357DA1483713E00BCE1BB /* _Contact.m in Sources */ = {isa = PBXBuildFile; fileRef = E27357D81483713E00BCE1BB /* _Contact.m */; };
 		E27357E71483812C00BCE1BB /* Contact.m in Sources */ = {isa = PBXBuildFile; fileRef = E27357E61483812C00BCE1BB /* Contact.m */; };
@@ -377,7 +376,6 @@
 				E27357C61482D84F00BCE1BB /* AddressbookSyncDemo.xcdatamodeld in Sources */,
 				E27357C81482D8BD00BCE1BB /* NSObject+BlockExtensions.m in Sources */,
 				E27357C91482D8C400BCE1BB /* NSManagedObjectContext+SearchExtensions.m in Sources */,
-				E27357D51482DF5000BCE1BB /* Contact.m in Sources */,
 				E27357DA1483713E00BCE1BB /* _Contact.m in Sources */,
 				E27357E71483812C00BCE1BB /* Contact.m in Sources */,
 			);
