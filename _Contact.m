@@ -26,14 +26,22 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 		NSURL *documentsDirectory = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
 		_mappings = [NSDictionary dictionaryWithContentsOfURL:[documentsDirectory URLByAppendingPathComponent:@"contactMapping.plist"]];
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveRequest:) name:NSManagedObjectContextDidSaveNotification object:nil];
+#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveRequest:) name:UIApplicationWillResignActiveNotification object:nil];
+#else
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveRequest:) name:NSApplicationWillResignActiveNotification object:nil];
+#endif
 	}
 	return self;
 }
 
 - (void)dealloc {
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:nil];
+#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillResignActiveNotification object:nil];
+#else
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationWillResignActiveNotification object:nil];
+#endif
 }
 
 - (void)saveRequest:(NSNotification *)notification {
@@ -52,14 +60,14 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 	}
 }
 
-- (NSString *)identifierForContact:(NSManagedObject *)contact {
+- (NSString *)identifierForContact:(_Contact *)contact {
 	@synchronized(self) {
 		NSString *key = [[contact.objectID URIRepresentation] absoluteString];
 		return [_mappings objectForKey:key];
 	}
 }
 
-- (void)setIdentifier:(NSString *)identifier forContact:(NSManagedObject *)contact {
+- (void)setIdentifier:(NSString *)identifier forContact:(_Contact *)contact {
 	NSString *key = [[contact.objectID URIRepresentation] absoluteString];
 	@synchronized(self) {
 		NSMutableDictionary *newMappings = [NSMutableDictionary dictionaryWithDictionary:_mappings];
@@ -69,7 +77,7 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 	_changed = YES;
 }
 
-- (void)removeIdentifierForContact:(NSManagedObject *)contact {
+- (void)removeIdentifierForContact:(_Contact *)contact {
 	NSString *key = [[contact.objectID URIRepresentation] absoluteString];
 	@synchronized(self) {
 		NSMutableDictionary *newMappings = [NSMutableDictionary dictionaryWithDictionary:_mappings];
@@ -85,6 +93,30 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 	}
 }
 
+- (_Contact *)contactObjectForIdentifier:(NSString *)identifier {
+	if ([self contactExistsForIdentifier:identifier]) {
+		@synchronized(self) {
+			for (NSString *urlAsString in [_mappings allKeys]) {
+				if ([[_mappings valueForKey:urlAsString] isEqualToString:identifier]) {
+					NSError *error = nil;
+					NSURL *objectURL = [NSURL URLWithString:urlAsString];
+					if (objectURL) {
+						NSManagedObjectID *objectId = [[MANAGED_OBJECT_CONTEXT persistentStoreCoordinator] managedObjectIDForURIRepresentation:objectURL];
+						if (objectId) {
+							_Contact *contact = (_Contact *)[MANAGED_OBJECT_CONTEXT existingObjectWithID:objectId error:&error];
+							if (error) {
+								NSLog(@"Error retreiving object: %@", [error localizedDescription]);
+							}
+							return contact;
+						}
+					}
+				}
+			}
+		}
+	}
+	return nil;
+}
+
 @end
 
 @implementation _Contact
@@ -95,6 +127,10 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 @dynamic company;
 @dynamic isCompany;
 @dynamic syncStatus;
+
+// These must be declared in the subclass
+@dynamic compositeName;
+@dynamic secondaryCompositeName;
 
 @synthesize addressbookIdentifier;
 @synthesize addressbookRecord;
@@ -107,12 +143,18 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 	});
 	return _operationQueue;
 }
-/*
+
+
++ (Contact *)findContactForRecordId:(ABRecordID)recordId {
+	NSString *addressbookIdentifier = [NSString stringWithFormat:@"%d", recordId];
+	return [[ContactMappingCache sharedInstance] contactObjectForIdentifier:addressbookIdentifier];
+}
+
 - (void)awakeFromFetch {
 	[super awakeFromFetch];
 	
 	NSLog(@"Contact '%@' has been initialiased, loading details from cache", self.compositeName);
-	self.addressbookIdentifier = (ABRecordID)[[[ContactMappingCache sharedInstance] identifierForContact:self] integerValue];
+	self.addressbookIdentifier = (AddressbookRecordIdentifier)[[[ContactMappingCache sharedInstance] identifierForContact:self] integerValue];
 	_addressbookCacheState = kAddressbookCacheNotLoaded;
 	if (self.addressbookIdentifier != 0) {
 		self.addressbookRecord = ABAddressBookGetPersonWithRecordID(ABAddressBookCreate(), self.addressbookIdentifier);
@@ -121,25 +163,25 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 			self.addressbookIdentifier = 0;
 			[[ContactMappingCache sharedInstance] removeIdentifierForContact:self];
 			[[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:kContactSyncStateChangedNotification object:self  userInfo:[NSDictionary dictionaryWithObject:self forKey:NSUpdatedObjectsKey]]];
-			[self syncAddressbookRecord];
+			[(NSObject<Contact> *)self syncAddressbookRecord];
 		} else {
-			if ([self isContactOlderThanAddressbookRecord:self.addressbookRecord]) {
+			if ([(NSObject<Contact> *)self isContactOlderThanAddressbookRecord:self.addressbookRecord]) {
 				NSLog(@"Addressbook contact is newer, we need to update our cache");
-				[self updateManagedObjectWithAddressbookRecordDetails];
+				[(NSObject<Contact> *)self updateManagedObjectWithAddressbookRecordDetails];
 			}
 			_addressbookCacheState = kAddressbookCacheLoaded;
 			NSLog(@"Contact '%@' loaded", self.compositeName);
 		}
 	} else {
 		NSLog(@"Contact '%@' has no identifier in the mapping yet", self.compositeName);
-		[[Contact sharedOperationQueue] addOperationWithBlock:^{
-			[self syncAddressbookRecord];
+		[[_Contact sharedOperationQueue] addOperationWithBlock:^{
+			[(NSObject<Contact> *)self syncAddressbookRecord];
 		}];
 		
 		//		[self syncAddressbookRecord];
 	}
 }
-*/
+
 - (void)awakeFromInsert {
 	[super awakeFromInsert];
 	_addressbookCacheState = kAddressbookCacheNotLoaded;

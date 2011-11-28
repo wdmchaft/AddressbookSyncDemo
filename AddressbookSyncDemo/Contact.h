@@ -7,22 +7,17 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <CoreData/CoreData.h>
 #import "_Contact.h"
 #import <AddressBook/AddressBook.h>
 
 @interface Contact : _Contact <Contact> {
 }
 
-@property (weak, nonatomic, readonly) NSString *compositeName;
-@property (weak, nonatomic, readonly) NSString *secondaryCompositeName;
-
-+ (Contact *)initContactWithAddressbookRecord:(ABRecordRef)record;
-+ (Contact *)findContactForRecordId:(ABRecordID)recordId;
-- (BOOL)isContactOlderThanAddressbookRecord:(ABRecordRef)record;
-
-- (ABRecordRef)findAddressbookRecord;
++ (Contact *)initContactWithAddressbookRecord:(AddressbookRecord)record;
+- (void)updateManagedObjectWithAddressbookRecordDetails;
+- (BOOL)isContactOlderThanAddressbookRecord:(AddressbookRecord)record;
+- (AddressbookRecord)findAddressbookRecord;
 - (AddressbookResyncResults)syncAddressbookRecord;
-- (void)resolveConflictWithAddressbookRecord:(ABRecordRef)record;
+- (void)resolveConflictWithAddressbookRecord:(AddressbookRecord)record;
 
 @end

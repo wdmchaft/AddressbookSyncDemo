@@ -9,10 +9,6 @@
 #import "Contact.h"
 #import "UIAlertView+BlockExtensions.h"
 
-@interface Contact (private)
-- (void)updateManagedObjectWithAddressbookRecordDetails;
-@end
-
 @implementation Contact
 
 
@@ -24,15 +20,6 @@
 	[contact updateManagedObjectWithAddressbookRecordDetails];
 	
 	return contact;
-}
-
-+ (Contact *)findContactForRecordId:(ABRecordID)recordId {
-	return nil;
-	
-	NSString *addressbookIdentifier = [NSString stringWithFormat:@"%d", recordId];	
-	// Check if we already have this contact in out object tree
-	NSSet *results = [MANAGED_OBJECT_CONTEXT fetchObjectsForEntityName:@"Contact" withPredicate:@"addressbookIdentifier == %@", addressbookIdentifier];
-	return [results anyObject];
 }
 
 - (BOOL)isContactOlderThanAddressbookRecord:(ABRecordRef)record {

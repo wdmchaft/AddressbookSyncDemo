@@ -38,12 +38,13 @@ extern NSString *kContactSyncStateChangedNotification;
 @class Contact;
 
 @protocol Contact <NSObject>
-@property (assign) AddressbookRecordIdentifier addressbookIdentifier;
-@property (assign) AddressbookRecord addressbookRecord;
+
+@property (weak, nonatomic, readonly) NSString *compositeName;
+@property (weak, nonatomic, readonly) NSString *secondaryCompositeName;
 
 + (Contact *)initContactWithAddressbookRecord:(AddressbookRecord)record;
-+ (Contact *)findContactForRecordId:(AddressbookRecordIdentifier)recordId;
 
+- (void)updateManagedObjectWithAddressbookRecordDetails;
 - (BOOL)isContactOlderThanAddressbookRecord:(AddressbookRecord)record;
 - (AddressbookRecord)findAddressbookRecord;
 - (AddressbookResyncResults)syncAddressbookRecord;
@@ -72,6 +73,7 @@ extern NSString *kContactSyncStateChangedNotification;
 @property (assign) AddressbookRecordIdentifier addressbookIdentifier;
 @property (assign) AddressbookRecord addressbookRecord;
 
++ (_Contact *)findContactForRecordId:(AddressbookRecordIdentifier)recordId;
 + (NSOperationQueue *)sharedOperationQueue;
 
 @end
@@ -82,8 +84,8 @@ extern NSString *kContactSyncStateChangedNotification;
 	BOOL _changed;
 }
 + (ContactMappingCache *)sharedInstance;
-- (NSString *)identifierForContact:(Contact *)contact;
-- (void)setIdentifier:(NSString *)identifier forContact:(Contact *)contact;
-- (void)removeIdentifierForContact:(Contact *)contact;
+- (NSString *)identifierForContact:(_Contact *)contact;
+- (void)setIdentifier:(NSString *)identifier forContact:(_Contact *)contact;
+- (void)removeIdentifierForContact:(_Contact *)contact;
 - (BOOL)contactExistsForIdentifier:(NSString *)identifier;
 @end

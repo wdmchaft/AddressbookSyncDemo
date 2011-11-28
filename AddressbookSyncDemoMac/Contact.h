@@ -10,4 +10,11 @@
 
 @interface Contact : _Contact <Contact>
 
++ (Contact *)initContactWithAddressbookRecord:(AddressbookRecord)record;
+- (void)updateManagedObjectWithAddressbookRecordDetails;
+- (BOOL)isContactOlderThanAddressbookRecord:(AddressbookRecord)record;
+- (AddressbookRecord)findAddressbookRecord;
+- (AddressbookResyncResults)syncAddressbookRecord;
+- (void)resolveConflictWithAddressbookRecord:(AddressbookRecord)record;
+
 @end
