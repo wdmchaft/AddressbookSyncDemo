@@ -8,6 +8,7 @@
 
 #import "Contact.h"
 #import "UIAlertView+BlockExtensions.h"
+#import "PhoneNumber.h"
 
 @implementation Contact
 
@@ -31,18 +32,14 @@
 
 - (ABRecordRef)findAddressbookRecord {
 	ABRecordRef record;
-	if (!self.addressbookRecord) {
-		if (self.addressbookIdentifier) {
-			ABAddressBookRef addressbook = ABAddressBookCreate();
-			record = ABAddressBookGetPersonWithRecordID(addressbook, self.addressbookIdentifier);
-			if (record == nil) { // i.e. we couldn't find the record
-				NSLog(@"The value we had for addressbook identifier was incorrect (contact didn't exist)");
-				self.addressbookIdentifier = 0;
-				[[ContactMappingCache sharedInstance] removeIdentifierForContact:self];
-				_addressbookCacheState = kAddressbookCacheNotLoaded;
-				[[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:kContactSyncStateChangedNotification object:self  userInfo:[NSDictionary dictionaryWithObject:self forKey:NSUpdatedObjectsKey]]];
-			}
-			CFRelease(addressbook);
+	if (self.addressbookIdentifier) {
+		record = ABAddressBookGetPersonWithRecordID([Contact sharedAddressbook], self.addressbookIdentifier);
+		if (record == nil) { // i.e. we couldn't find the record
+			NSLog(@"The value we had for addressbook identifier was incorrect (contact didn't exist)");
+			self.addressbookIdentifier = 0;
+			[[ContactMappingCache sharedInstance] removeIdentifierForContact:self];
+			_addressbookCacheState = kAddressbookCacheNotLoaded;
+			[[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:kContactSyncStateChangedNotification object:self  userInfo:[NSDictionary dictionaryWithObject:self forKey:NSUpdatedObjectsKey]]];
 		}
 	}
 	
@@ -147,7 +144,7 @@
 			NSString *firstName = (self.firstName?self.firstName:@"");
 			NSString *lastName = (self.lastName?self.lastName:@"");
 			if (ABPersonGetCompositeNameFormat() == kABPersonCompositeNameFormatFirstNameFirst) {
-					return [NSString stringWithFormat:@"%@ %@", firstName, lastName];
+				return [NSString stringWithFormat:@"%@ %@", firstName, lastName];
 			} else {
 				return [NSString stringWithFormat:@"%@ %@", lastName, firstName];
 			}
@@ -172,11 +169,12 @@
 
 - (void)updateManagedObjectWithAddressbookRecordDetails {
 	
-	if (self.addressbookRecord == 0) {
-		NSLog(@"Can't update record, object's _addressbookRecord is nil");
+	ABRecordRef record;
+	if ((record = self.addressbookRecord) == NULL) {
+		NSLog(@"Can't update record, addressbook record not found");
 		return;
 	}
-	
+
 	CFStringRef firstName = ABRecordCopyValue(self.addressbookRecord, kABPersonFirstNameProperty);
 	CFStringRef lastName = ABRecordCopyValue(self.addressbookRecord, kABPersonLastNameProperty);
 	CFStringRef company = ABRecordCopyValue(self.addressbookRecord, kABPersonOrganizationProperty);
@@ -207,6 +205,27 @@
 	}
 	
 	[[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:kContactSyncStateChangedNotification object:self  userInfo:[NSDictionary dictionaryWithObject:self forKey:NSUpdatedObjectsKey]]];
+}
+
+- (NSArray *)phoneNumbers {
+	ABRecordRef record = self.addressbookRecord;
+	NSArray *result;
+	if (record) {
+		ABMultiValueRef properties = ABRecordCopyValue(record, kABPersonPhoneProperty);
+		CFIndex max = ABMultiValueGetCount(properties);
+		if (max != 0) {
+			NSMutableArray *values = [NSMutableArray array];
+			for (CFIndex i = 0; i < max; i++) {
+				NSLog(@"%ld", i);
+				PhoneNumber *phoneNumber = [[PhoneNumber alloc] init];
+				phoneNumber.identifier = ABMultiValueGetIdentifierAtIndex(properties, i);
+				phoneNumber.properties = properties;
+				[values addObject:phoneNumber];
+			}
+			result = values;
+		}
+	}
+	return result;
 }
 
 @end

@@ -42,6 +42,8 @@ extern NSString *kContactSyncStateChangedNotification;
 @property (weak, nonatomic, readonly) NSString *compositeName;
 @property (weak, nonatomic, readonly) NSString *secondaryCompositeName;
 
+@property (weak, nonatomic, readonly) NSArray *phoneNumbers;
+
 + (Contact *)initContactWithAddressbookRecord:(AddressbookRecord)record;
 
 - (void)updateManagedObjectWithAddressbookRecordDetails;
@@ -84,6 +86,12 @@ extern NSString *kContactSyncStateChangedNotification;
 
 + (_Contact *)findContactForRecordId:(AddressbookRecordIdentifier)recordId;
 + (NSOperationQueue *)sharedOperationQueue;
+
+#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
++ (ABAddressBookRef)sharedAddressbook;
+#else
++ (ABAddressBook *)sharedAddressbook;
+#endif
 
 @end
 

@@ -47,6 +47,9 @@
 		E2BB1E1B147D7E59002263D0 /* ShowContactDetails.m in Sources */ = {isa = PBXBuildFile; fileRef = E2BB1E1A147D7E53002263D0 /* ShowContactDetails.m */; };
 		E2BB1E1E147D88E9002263D0 /* ContactSyncHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = E2BB1E1D147D88E8002263D0 /* ContactSyncHandler.m */; };
 		E2CD2488147F802100550386 /* UIAlertView+BlockExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = E2CD2487147F802100550386 /* UIAlertView+BlockExtensions.m */; };
+		E2CD24AB1484C5EA00550386 /* _PhoneNumber.m in Sources */ = {isa = PBXBuildFile; fileRef = E2CD24AA1484C5EA00550386 /* _PhoneNumber.m */; };
+		E2CD24AC1484C5EA00550386 /* _PhoneNumber.m in Sources */ = {isa = PBXBuildFile; fileRef = E2CD24AA1484C5EA00550386 /* _PhoneNumber.m */; };
+		E2CD24B01484C72F00550386 /* PhoneNumber.m in Sources */ = {isa = PBXBuildFile; fileRef = E2CD24AF1484C72F00550386 /* PhoneNumber.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -109,6 +112,10 @@
 		E2BB1E1D147D88E8002263D0 /* ContactSyncHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ContactSyncHandler.m; sourceTree = "<group>"; };
 		E2CD2486147F802100550386 /* UIAlertView+BlockExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIAlertView+BlockExtensions.h"; sourceTree = "<group>"; };
 		E2CD2487147F802100550386 /* UIAlertView+BlockExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIAlertView+BlockExtensions.m"; sourceTree = "<group>"; };
+		E2CD24A91484C5EA00550386 /* _PhoneNumber.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _PhoneNumber.h; sourceTree = "<group>"; };
+		E2CD24AA1484C5EA00550386 /* _PhoneNumber.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = _PhoneNumber.m; sourceTree = "<group>"; };
+		E2CD24AE1484C72F00550386 /* PhoneNumber.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhoneNumber.h; sourceTree = "<group>"; };
+		E2CD24AF1484C72F00550386 /* PhoneNumber.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhoneNumber.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -179,6 +186,8 @@
 				E27357D61482E05F00BCE1BB /* Global.h */,
 				E27357D71483713E00BCE1BB /* _Contact.h */,
 				E27357D81483713E00BCE1BB /* _Contact.m */,
+				E2CD24A91484C5EA00550386 /* _PhoneNumber.h */,
+				E2CD24AA1484C5EA00550386 /* _PhoneNumber.m */,
 			);
 			name = Generic;
 			sourceTree = "<group>";
@@ -271,6 +280,8 @@
 				E27357A014817E7E00BCE1BB /* UnmatchedContactConflictResolverViewController.m */,
 				E2BB1E0B147D3EAB002263D0 /* Contact.h */,
 				E2BB1E0C147D3EAB002263D0 /* Contact.m */,
+				E2CD24AE1484C72F00550386 /* PhoneNumber.h */,
+				E2CD24AF1484C72F00550386 /* PhoneNumber.m */,
 			);
 			path = AddressbookSyncDemo;
 			sourceTree = "<group>";
@@ -388,6 +399,7 @@
 				E27357DA1483713E00BCE1BB /* _Contact.m in Sources */,
 				E27357E71483812C00BCE1BB /* Contact.m in Sources */,
 				E27357F21484285800BCE1BB /* SelectContactSheetController.m in Sources */,
+				E2CD24AC1484C5EA00550386 /* _PhoneNumber.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -409,6 +421,8 @@
 				E22A5A8614810C8C00485A50 /* AmbigousContactConflictResolverViewController.m in Sources */,
 				E27357A114817E7E00BCE1BB /* UnmatchedContactConflictResolverViewController.m in Sources */,
 				E27357D91483713E00BCE1BB /* _Contact.m in Sources */,
+				E2CD24AB1484C5EA00550386 /* _PhoneNumber.m in Sources */,
+				E2CD24B01484C72F00550386 /* PhoneNumber.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
