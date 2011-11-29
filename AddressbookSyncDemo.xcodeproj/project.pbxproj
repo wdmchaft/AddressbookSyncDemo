@@ -50,6 +50,11 @@
 		E2CD24AB1484C5EA00550386 /* _PhoneNumber.m in Sources */ = {isa = PBXBuildFile; fileRef = E2CD24AA1484C5EA00550386 /* _PhoneNumber.m */; };
 		E2CD24AC1484C5EA00550386 /* _PhoneNumber.m in Sources */ = {isa = PBXBuildFile; fileRef = E2CD24AA1484C5EA00550386 /* _PhoneNumber.m */; };
 		E2CD24B01484C72F00550386 /* PhoneNumber.m in Sources */ = {isa = PBXBuildFile; fileRef = E2CD24AF1484C72F00550386 /* PhoneNumber.m */; };
+		E2CD24BE14855B0100550386 /* TFAddressbook.m in Sources */ = {isa = PBXBuildFile; fileRef = E2CD24BA14855B0100550386 /* TFAddressbook.m */; };
+		E2CD24BF14855B0100550386 /* TFRecord.m in Sources */ = {isa = PBXBuildFile; fileRef = E2CD24BD14855B0100550386 /* TFRecord.m */; };
+		E2CD24C214855C0200550386 /* TFMultiValue.m in Sources */ = {isa = PBXBuildFile; fileRef = E2CD24C114855C0100550386 /* TFMultiValue.m */; };
+		E2CD24C514855D3500550386 /* TFPerson.m in Sources */ = {isa = PBXBuildFile; fileRef = E2CD24C414855D3400550386 /* TFPerson.m */; };
+		E2CD24C814855D5200550386 /* TFGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = E2CD24C714855D5000550386 /* TFGroup.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -116,6 +121,17 @@
 		E2CD24AA1484C5EA00550386 /* _PhoneNumber.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = _PhoneNumber.m; sourceTree = "<group>"; };
 		E2CD24AE1484C72F00550386 /* PhoneNumber.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhoneNumber.h; sourceTree = "<group>"; };
 		E2CD24AF1484C72F00550386 /* PhoneNumber.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhoneNumber.m; sourceTree = "<group>"; };
+		E2CD24B914855B0100550386 /* TFAddressbook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TFAddressbook.h; path = ../TFAddressbook/TFAddressbook.h; sourceTree = "<group>"; };
+		E2CD24BA14855B0100550386 /* TFAddressbook.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TFAddressbook.m; path = ../TFAddressbook/TFAddressbook.m; sourceTree = "<group>"; };
+		E2CD24BB14855B0100550386 /* TFConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TFConstants.h; path = ../TFAddressbook/TFConstants.h; sourceTree = "<group>"; };
+		E2CD24BC14855B0100550386 /* TFRecord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TFRecord.h; path = ../TFAddressbook/TFRecord.h; sourceTree = "<group>"; };
+		E2CD24BD14855B0100550386 /* TFRecord.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TFRecord.m; path = ../TFAddressbook/TFRecord.m; sourceTree = "<group>"; };
+		E2CD24C014855C0000550386 /* TFMultiValue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TFMultiValue.h; path = ../TFAddressbook/TFMultiValue.h; sourceTree = "<group>"; };
+		E2CD24C114855C0100550386 /* TFMultiValue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TFMultiValue.m; path = ../TFAddressbook/TFMultiValue.m; sourceTree = "<group>"; };
+		E2CD24C314855D3300550386 /* TFPerson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TFPerson.h; path = ../TFAddressbook/TFPerson.h; sourceTree = "<group>"; };
+		E2CD24C414855D3400550386 /* TFPerson.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TFPerson.m; path = ../TFAddressbook/TFPerson.m; sourceTree = "<group>"; };
+		E2CD24C614855D5000550386 /* TFGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TFGroup.h; path = ../TFAddressbook/TFGroup.h; sourceTree = "<group>"; };
+		E2CD24C714855D5000550386 /* TFGroup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TFGroup.m; path = ../TFAddressbook/TFGroup.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -228,6 +244,7 @@
 		E2BB1DD0147D3CCC002263D0 = {
 			isa = PBXGroup;
 			children = (
+				E2CD24B614855AD000550386 /* TFAddressbook */,
 				E27357C71482D86B00BCE1BB /* Generic */,
 				E27357CF1482DD7E00BCE1BB /* Mac */,
 				E27357CE1482DD1900BCE1BB /* iOS */,
@@ -297,6 +314,24 @@
 			);
 			name = "Supporting Files";
 			path = AddressbookSyncDemo;
+			sourceTree = "<group>";
+		};
+		E2CD24B614855AD000550386 /* TFAddressbook */ = {
+			isa = PBXGroup;
+			children = (
+				E2CD24BB14855B0100550386 /* TFConstants.h */,
+				E2CD24B914855B0100550386 /* TFAddressbook.h */,
+				E2CD24BA14855B0100550386 /* TFAddressbook.m */,
+				E2CD24BC14855B0100550386 /* TFRecord.h */,
+				E2CD24BD14855B0100550386 /* TFRecord.m */,
+				E2CD24C014855C0000550386 /* TFMultiValue.h */,
+				E2CD24C114855C0100550386 /* TFMultiValue.m */,
+				E2CD24C314855D3300550386 /* TFPerson.h */,
+				E2CD24C414855D3400550386 /* TFPerson.m */,
+				E2CD24C614855D5000550386 /* TFGroup.h */,
+				E2CD24C714855D5000550386 /* TFGroup.m */,
+			);
+			name = TFAddressbook;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -423,6 +458,11 @@
 				E27357D91483713E00BCE1BB /* _Contact.m in Sources */,
 				E2CD24AB1484C5EA00550386 /* _PhoneNumber.m in Sources */,
 				E2CD24B01484C72F00550386 /* PhoneNumber.m in Sources */,
+				E2CD24BE14855B0100550386 /* TFAddressbook.m in Sources */,
+				E2CD24BF14855B0100550386 /* TFRecord.m in Sources */,
+				E2CD24C214855C0200550386 /* TFMultiValue.m in Sources */,
+				E2CD24C514855D3500550386 /* TFPerson.m in Sources */,
+				E2CD24C814855D5200550386 /* TFGroup.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

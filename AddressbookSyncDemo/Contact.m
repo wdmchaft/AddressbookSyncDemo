@@ -209,20 +209,30 @@
 
 - (NSArray *)phoneNumbers {
 	ABRecordRef record = self.addressbookRecord;
-	NSArray *result;
 	if (record) {
 		ABMultiValueRef properties = ABRecordCopyValue(record, kABPersonPhoneProperty);
 		CFIndex max = ABMultiValueGetCount(properties);
 		if (max != 0) {
 			NSMutableArray *values = [NSMutableArray arrayWithArray:_phoneNumbers];
 			for (CFIndex i = 0; i < max; i++) {
-				NSLog(@"%ld", i);
-				PhoneNumber *phoneNumber = [[PhoneNumber alloc] init];
-				phoneNumber.identifier = ABMultiValueGetIdentifierAtIndex(properties, i);
+				ABMultiValueIdentifier identifier = ABMultiValueGetIdentifierAtIndex(properties, i);
+				NSUInteger index = [values indexOfObjectPassingTest:^BOOL(PhoneNumber *obj, NSUInteger idx, BOOL *stop) {
+					return obj.identifier == identifier;
+				}];
+				PhoneNumber *phoneNumber;
+				if (index == NSNotFound) {
+					NSLog(@"creating new");
+					phoneNumber = [[PhoneNumber alloc] init];
+					phoneNumber.identifier = identifier;
+					[values addObject:phoneNumber];
+				} else {
+					NSLog(@"reusing & updating");
+					phoneNumber = [values objectAtIndex:index];
+				}
 				phoneNumber.properties = properties;
-				[values addObject:phoneNumber];
 			}
-			result = values;
+			
+			_phoneNumbers = [values filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"hasChanged = YES"]];
 		}
 	}
 	return _phoneNumbers;
