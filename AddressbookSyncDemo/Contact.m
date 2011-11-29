@@ -214,7 +214,7 @@
 		ABMultiValueRef properties = ABRecordCopyValue(record, kABPersonPhoneProperty);
 		CFIndex max = ABMultiValueGetCount(properties);
 		if (max != 0) {
-			NSMutableArray *values = [NSMutableArray array];
+			NSMutableArray *values = [NSMutableArray arrayWithArray:_phoneNumbers];
 			for (CFIndex i = 0; i < max; i++) {
 				NSLog(@"%ld", i);
 				PhoneNumber *phoneNumber = [[PhoneNumber alloc] init];
@@ -225,7 +225,20 @@
 			result = values;
 		}
 	}
-	return result;
+	return _phoneNumbers;
 }
+
+- (NSArray *)emailAddresses {
+	return _emailAddresses;
+}
+
+- (NSArray *)addresses {
+	return _addresses;
+}
+
+- (NSArray *)websites {
+	return _websites;
+}
+
 
 @end

@@ -43,6 +43,9 @@ extern NSString *kContactSyncStateChangedNotification;
 @property (weak, nonatomic, readonly) NSString *secondaryCompositeName;
 
 @property (weak, nonatomic, readonly) NSArray *phoneNumbers;
+@property (weak, nonatomic, readonly) NSArray *emailAddresses;
+@property (weak, nonatomic, readonly) NSArray *addresses;
+@property (weak, nonatomic, readonly) NSArray *websites;
 
 + (Contact *)initContactWithAddressbookRecord:(AddressbookRecord)record;
 
@@ -58,6 +61,10 @@ extern NSString *kContactSyncStateChangedNotification;
 @interface _Contact : NSManagedObject {
 	AddressbookCacheState _addressbookCacheState;
 	NSArray *_ambigousPossibleMatches;
+	NSArray *_phoneNumbers;
+	NSArray *_emailAddresses;
+	NSArray *_addresses;
+	NSArray *_websites;
 }
 
 @property (nonatomic, strong) NSDate * lastSync;
