@@ -8,16 +8,16 @@
 
 #import <Foundation/Foundation.h>
 #import "_Contact.h"
-#import <AddressBook/AddressBook.h>
+#import "TFABAddressBook.h"
 
 @interface Contact : _Contact <Contact> {
 }
 
-+ (Contact *)initContactWithAddressbookRecord:(AddressbookRecord)record;
++ (Contact *)initContactWithAddressbookRecord:(TFRecord *)record;
 - (void)updateManagedObjectWithAddressbookRecordDetails;
-- (BOOL)isContactOlderThanAddressbookRecord:(AddressbookRecord)record;
-- (AddressbookRecord)findAddressbookRecord;
+- (BOOL)isContactOlderThanAddressbookRecord:(TFRecord *)record;
+- (TFRecord *)findAddressbookRecord;
 - (AddressbookResyncResults)syncAddressbookRecord;
-- (void)resolveConflictWithAddressbookRecord:(AddressbookRecord)record;
+- (void)resolveConflictWithAddressbookRecord:(TFRecord *)record;
 
 @end

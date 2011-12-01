@@ -7,6 +7,7 @@
 //
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
+#import "TFABAddressBook.h"
 
 typedef enum {
 	kAddressbookCacheNotLoaded,
@@ -25,15 +26,6 @@ typedef enum {
 
 extern NSString *kContactSyncStateChangedNotification;
 
-#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-#	import <AddressBook/AddressBook.h>
-#	define AddressbookRecordIdentifier ABRecordID
-#	define AddressbookRecord ABRecordRef
-#else
-#	import <AddressBook/AddressBook.h>
-#	define AddressbookRecordIdentifier NSString *
-#	define AddressbookRecord ABRecord *
-#endif
 
 @class Contact;
 
@@ -47,13 +39,13 @@ extern NSString *kContactSyncStateChangedNotification;
 @property (weak, nonatomic, readonly) NSArray *addresses;
 @property (weak, nonatomic, readonly) NSArray *websites;
 
-+ (Contact *)initContactWithAddressbookRecord:(AddressbookRecord)record;
++ (Contact *)initContactWithAddressbookRecord:(TFRecord *)record;
 
 - (void)updateManagedObjectWithAddressbookRecordDetails;
-- (BOOL)isContactOlderThanAddressbookRecord:(AddressbookRecord)record;
-- (AddressbookRecord)findAddressbookRecord;
+- (BOOL)isContactOlderThanAddressbookRecord:(TFRecord *)record;
+- (TFRecord *)findAddressbookRecord;
 - (AddressbookResyncResults)syncAddressbookRecord;
-- (void)resolveConflictWithAddressbookRecord:(AddressbookRecord)record;
+- (void)resolveConflictWithAddressbookRecord:(TFRecord *)record;
 
 @end
 
@@ -84,21 +76,14 @@ extern NSString *kContactSyncStateChangedNotification;
 @property (weak, nonatomic, readonly) NSString *groupingIndexCharacter;
 
 #if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-@property (nonatomic, assign) AddressbookRecordIdentifier addressbookIdentifier;
-@property (nonatomic, readonly) AddressbookRecord addressbookRecord;
+@property (nonatomic, assign) TFRecordID addressbookIdentifier;
 #else
-@property (nonatomic, strong) AddressbookRecordIdentifier addressbookIdentifier;
-@property (nonatomic, readonly, weak) AddressbookRecord addressbookRecord;
+@property (nonatomic, strong) TFRecordID addressbookIdentifier;
 #endif
+@property (nonatomic, readonly, weak) TFRecord *addressbookRecord;
 
-+ (_Contact *)findContactForRecordId:(AddressbookRecordIdentifier)recordId;
++ (_Contact *)findContactForRecordId:(TFRecordID)recordId;
 + (NSOperationQueue *)sharedOperationQueue;
-
-#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-+ (ABAddressBookRef)sharedAddressbook;
-#else
-+ (ABAddressBook *)sharedAddressbook;
-#endif
 
 @end
 

@@ -7,6 +7,7 @@
 //
 
 #import "MasterViewController.h"
+#import "TFABAddressBook.h"
 
 #import "DetailViewController.h"
 #import "Contact.h"
@@ -419,7 +420,7 @@
 	}
 	
 	// Add this contact to the Object Graph
-	Contact *contact = [Contact initContactWithAddressbookRecord:person];
+	Contact *contact = [Contact initContactWithAddressbookRecord:[[TFPerson alloc] initWithRef:person]];
 	NSLog(@"Adding %@", [contact compositeName]);
 	
 	[(AppDelegate *)[UIApp delegate] saveContext];
