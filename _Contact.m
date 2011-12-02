@@ -139,18 +139,14 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 
 - (TFRecordID)addressbookIdentifier {
 	if (addressbookIdentifier == 0) {
-#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-		addressbookIdentifier = (TFRecordID)[[[ContactMappingCache sharedInstance] identifierForContact:self] integerValue];
-#else
-		addressbookIdentifier = (TFRecordID)[[ContactMappingCache sharedInstance] identifierForContact:self];
-#endif
+		addressbookIdentifier = [[ContactMappingCache sharedInstance] identifierForContact:self];
 	}
 	return addressbookIdentifier;
 }
 
 
 - (TFRecord *)addressbookRecord {
-	if (self.addressbookIdentifier != nil) {
+	if (self.addressbookIdentifier != 0) {
 		return [[[self class] sharedAddressBook] recordForUniqueId:self.addressbookIdentifier];
 	}
 	return nil;
@@ -500,14 +496,14 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 }
 
 - (_Contact *)contactObjectForIdentifier:(TFRecordID)uniqueID {
-	NSString *identifier = nil;
-#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-	identifier = [NSString stringWithFormat:@"%d", uniqueID];
-#else
-	identifier = uniqueID;
-#endif
-	if ([self contactExistsForIdentifier:identifier]) {
+	if ([self contactExistsForIdentifier:uniqueID]) {
 		@synchronized(self) {
+			NSString *identifier = nil;
+#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+			identifier = [NSString stringWithFormat:@"%d", uniqueID];
+#else
+			identifier = uniqueID;
+#endif
 			for (NSString *urlAsString in [_mappings allKeys]) {
 				if ([[_mappings valueForKey:urlAsString] isEqualToString:identifier]) {
 					NSError *error = nil;

@@ -92,9 +92,9 @@ extern NSString *kContactSyncStateChangedNotification;
 	BOOL _changed;
 }
 + (ContactMappingCache *)sharedInstance;
-- (NSString *)identifierForContact:(_Contact *)contact;
-- (void)setIdentifier:(NSString *)identifier forContact:(_Contact *)contact;
+- (TFRecordID)identifierForContact:(_Contact *)contact;
+- (void)setIdentifier:(TFRecordID)identifier forContact:(_Contact *)contact;
 - (void)removeIdentifierForContact:(_Contact *)contact;
-- (BOOL)contactExistsForIdentifier:(NSString *)identifier;
-- (_Contact *)contactObjectForIdentifier:(NSString *)identifier;
+- (BOOL)contactExistsForIdentifier:(TFRecordID)identifier;
+- (_Contact *)contactObjectForIdentifier:(TFRecordID)identifier;
 @end
