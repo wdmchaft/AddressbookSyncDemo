@@ -21,33 +21,7 @@
 }
 
 
-- (NSString *)compositeName {
-	if (self.isCompany) {
-		return self.company;
-	} else {
-		NSString *firstName = (self.firstName?self.firstName:@"");
-		NSString *lastName = (self.lastName?self.lastName:@"");
-		if ([[ABAddressBook sharedAddressBook] defaultNameOrdering] == kABFirstNameFirst) {
-			return [NSString stringWithFormat:@"%@ %@", firstName, lastName];
-		} else {
-			return [NSString stringWithFormat:@"%@ %@", lastName, firstName];
-		}
-	}
-}
 
-- (NSString *)secondaryCompositeName {
-	if (!self.isCompany) {
-		return self.company;
-	} else {
-		NSString *firstName = (self.firstName?self.firstName:@"");
-		NSString *lastName = (self.lastName?self.lastName:@"");
-		if ([[ABAddressBook sharedAddressBook] defaultNameOrdering] == kABFirstNameFirst) {
-			return [NSString stringWithFormat:@"%@ %@", firstName, lastName];
-		} else {
-			return [NSString stringWithFormat:@"%@ %@", lastName, firstName];
-		}
-	}
-}
 
 
 @end

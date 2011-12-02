@@ -11,6 +11,7 @@
 #import <AddressBook/AddressBook.h>
 #import <AddressBookUI/AddressBookUI.h>
 #import <QuartzCore/QuartzCore.h>
+#import "TFABAddressBook.h"
 
 @implementation UnmatchedContactConflictResolverViewController
 
@@ -23,7 +24,7 @@
 - (IBAction)done:(id)sender {
 	NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
     NSString *key = [[[_contactSectionIndexDictionary allKeys] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)] objectAtIndex:indexPath.section];
-	ABRecordRef record = (__bridge ABRecordRef)[[_contactSectionIndexDictionary objectForKey:key] objectAtIndex:indexPath.row];
+	TFRecord *record = [[_contactSectionIndexDictionary objectForKey:key] objectAtIndex:indexPath.row];
 
 	[contact resolveConflictWithAddressbookRecord:record];
 	[self dismissModalViewControllerAnimated:YES];

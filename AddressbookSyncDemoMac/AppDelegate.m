@@ -197,9 +197,8 @@
 
 - (void)setContactSelectionIndex:(NSIndexSet *)value {
 	contactSelectionIndex = value;
-	//[_contactSelectionIndex firstIndex];
-	if ([arrayController selectedObjects] && [[arrayController selectedObjects] count] != 0) {
-		Contact *contact = [[arrayController selectedObjects] objectAtIndex:0];
+	if ([contactSelectionIndex count] != 0) {
+		Contact *contact = [[arrayController arrangedObjects] objectAtIndex:[contactSelectionIndex firstIndex]];
 		[contact firstName];
 		[personView setPerson:(ABPerson *)contact.addressbookRecord];
 	}

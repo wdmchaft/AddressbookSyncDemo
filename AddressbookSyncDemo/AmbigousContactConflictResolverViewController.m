@@ -8,9 +8,9 @@
 
 #import "AmbigousContactConflictResolverViewController.h"
 #import "Contact.h"
-#import <AddressBook/AddressBook.h>
 #import <AddressBookUI/AddressBookUI.h>
 #import <QuartzCore/QuartzCore.h>
+#import "TFABAddressBook.h"
 
 @implementation AmbigousContactTableViewCell 
 @synthesize text;
@@ -27,7 +27,7 @@
 @synthesize titleView;
 
 - (IBAction)done:(id)sender {
-	ABRecordRef record = (__bridge ABRecordRef)[contact.ambigousContactMatches objectAtIndex:[self.tableView indexPathForSelectedRow].row];
+	TFRecord *record = [contact.ambigousContactMatches objectAtIndex:[self.tableView indexPathForSelectedRow].row];
 	[contact resolveConflictWithAddressbookRecord:record];
 	[self dismissModalViewControllerAnimated:YES];
 }
@@ -118,29 +118,29 @@
     
     AmbigousContactTableViewCell *cell = [tv dequeueReusableCellWithIdentifier:@"ContactCell"];
 	
-	ABRecordRef record = (__bridge ABRecordRef)[contact.ambigousContactMatches objectAtIndex:indexPath.row];
+	TFRecord *record = [contact.ambigousContactMatches objectAtIndex:indexPath.row];
 	
-	NSString *firstName = (__bridge_transfer NSString *)ABRecordCopyValue(record, kABPersonFirstNameProperty);
-	NSString *lastName = (__bridge_transfer NSString *)ABRecordCopyValue(record, kABPersonLastNameProperty);
-	NSString *company = (__bridge_transfer NSString *)ABRecordCopyValue(record, kABPersonOrganizationProperty);
-	NSDate *modificationDate = (__bridge_transfer NSDate *)ABRecordCopyValue(record, kABPersonModificationDateProperty);
+	NSString *firstName = [record valueForProperty:kTFFirstNameProperty];
+	NSString *lastName = [record valueForProperty:kTFLastNameProperty];
+	NSString *company = [record valueForProperty:kTFOrganizationProperty];
+	NSDate *modificationDate = [record valueForProperty:kTFModificationDateProperty];
 	
-	CFNumberRef personType = ABRecordCopyValue(record, kABPersonKindProperty);
+	NSUInteger personType = [[record valueForProperty:kTFPersonFlags] integerValue];
 	
 	NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
 	dateFormatter.dateStyle = NSDateFormatterShortStyle;
 	dateFormatter.timeStyle = NSDateFormatterShortStyle;
 	
-	if (personType == kABPersonKindOrganization) {
+	if (personType == (personType & kTFShowAsCompany)) {
 		if (company) {
 			cell.text.text = company;
-			if (ABPersonGetCompositeNameFormat() == kABPersonCompositeNameFormatFirstNameFirst) {
+			if ([[TFAddressBook sharedAddressBook] defaultNameOrdering] == kTFFirstNameFirst) {
 				cell.detailText.text = [NSString stringWithFormat:@"%@%@%@", firstName?firstName:@"", firstName?@" ":@"", lastName?lastName:@""];
 			} else {
 				cell.detailText.text = [NSString stringWithFormat:@"%@%@%@", lastName?lastName:@"", firstName?@" ":@"", firstName?firstName:@""];
 			}
 		} else if (firstName || lastName) {
-			if (ABPersonGetCompositeNameFormat() == kABPersonCompositeNameFormatFirstNameFirst) {
+			if ([[TFAddressBook sharedAddressBook] defaultNameOrdering] == kTFFirstNameFirst) {
 				cell.text.text = [NSString stringWithFormat:@"%@%@%@", firstName?firstName:@"", firstName?@" ":@"", lastName?lastName:@""];
 			} else {
 				cell.text.text = [NSString stringWithFormat:@"%@%@%@", lastName?lastName:@"", firstName?@" ":@"", firstName?firstName:@""];
@@ -151,7 +151,7 @@
 		}
 	} else {
 		if (firstName || lastName) {
-			if (ABPersonGetCompositeNameFormat() == kABPersonCompositeNameFormatFirstNameFirst) {
+			if ([[TFAddressBook sharedAddressBook] defaultNameOrdering] == kTFFirstNameFirst) {
 				cell.text.text = [NSString stringWithFormat:@"%@%@%@", firstName?firstName:@"", firstName?@" ":@"", lastName?lastName:@""];
 			} else {
 				cell.text.text = [NSString stringWithFormat:@"%@%@%@", lastName?lastName:@"", firstName?@" ":@"", firstName?firstName:@""];
@@ -165,8 +165,6 @@
 			cell.text.font = [UIFont italicSystemFontOfSize:18.0];
 		}
 	}
-	
-	CFRelease(personType);
 	
 	if (modificationDate) {
 		cell.lastModified.text = [NSString stringWithFormat:@"Last Updated: %@", [dateFormatter stringFromDate:modificationDate]];
@@ -222,9 +220,9 @@
 }
 
 - (void)tableView:(UITableView *)tableView accessoryButtonTappedForRowWithIndexPath:(NSIndexPath *)indexPath {
-	ABRecordRef record = (__bridge ABRecordRef)[contact.ambigousContactMatches objectAtIndex:indexPath.row];
+	TFRecord *record = [contact.ambigousContactMatches objectAtIndex:indexPath.row];
 	ABPersonViewController *picker = [[ABPersonViewController alloc] init];
-	picker.displayedPerson = record;
+	picker.displayedPerson = record.nativeObject;
 	// Allow users to edit the person’s information
 	picker.allowsEditing = NO;
 	

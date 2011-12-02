@@ -13,11 +13,4 @@
 @interface Contact : _Contact <Contact> {
 }
 
-+ (Contact *)initContactWithAddressbookRecord:(TFRecord *)record;
-- (void)updateManagedObjectWithAddressbookRecordDetails;
-- (BOOL)isContactOlderThanAddressbookRecord:(TFRecord *)record;
-- (TFRecord *)findAddressbookRecord;
-- (AddressbookResyncResults)syncAddressbookRecord;
-- (void)resolveConflictWithAddressbookRecord:(TFRecord *)record;
-
 @end

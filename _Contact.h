@@ -31,8 +31,6 @@ extern NSString *kContactSyncStateChangedNotification;
 
 @protocol Contact <NSObject>
 
-@property (weak, nonatomic, readonly) NSString *compositeName;
-@property (weak, nonatomic, readonly) NSString *secondaryCompositeName;
 
 @property (weak, nonatomic, readonly) NSArray *phoneNumbers;
 @property (weak, nonatomic, readonly) NSArray *emailAddresses;
@@ -40,12 +38,6 @@ extern NSString *kContactSyncStateChangedNotification;
 @property (weak, nonatomic, readonly) NSArray *websites;
 
 + (Contact *)initContactWithAddressbookRecord:(TFRecord *)record;
-
-- (void)updateManagedObjectWithAddressbookRecordDetails;
-- (BOOL)isContactOlderThanAddressbookRecord:(TFRecord *)record;
-- (TFRecord *)findAddressbookRecord;
-- (AddressbookResyncResults)syncAddressbookRecord;
-- (void)resolveConflictWithAddressbookRecord:(TFRecord *)record;
 
 @end
 
@@ -72,6 +64,7 @@ extern NSString *kContactSyncStateChangedNotification;
 
 @property (weak, nonatomic, readonly) NSString *compositeName;
 @property (weak, nonatomic, readonly) NSString *secondaryCompositeName;
+@property (weak, nonatomic, readonly) NSString *helpfullText;
 
 @property (weak, nonatomic, readonly) NSString *groupingIndexCharacter;
 
@@ -84,6 +77,12 @@ extern NSString *kContactSyncStateChangedNotification;
 
 + (_Contact *)findContactForRecordId:(TFRecordID)recordId;
 + (NSOperationQueue *)sharedOperationQueue;
+
+- (void)updateManagedObjectWithAddressbookRecordDetails;
+- (BOOL)isContactOlderThanAddressbookRecord:(TFRecord *)record;
+- (TFRecord *)findAddressbookRecord;
+- (AddressbookResyncResults)syncAddressbookRecord;
+- (void)resolveConflictWithAddressbookRecord:(TFRecord *)record;
 
 @end
 

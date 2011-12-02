@@ -22,40 +22,6 @@
 	return contact;
 }
 
-- (NSString *)compositeName {
-	if (self.addressbookRecord != nil) {
-		return (__bridge_transfer NSString *)ABRecordCopyCompositeName(self.addressbookRecord); 
-	} else {
-		if (self.isCompany) {
-			return self.company;
-		} else {
-			NSString *firstName = (self.firstName?self.firstName:@"");
-			NSString *lastName = (self.lastName?self.lastName:@"");
-			if (ABPersonGetCompositeNameFormat() == kABPersonCompositeNameFormatFirstNameFirst) {
-				return [NSString stringWithFormat:@"%@ %@", firstName, lastName];
-			} else {
-				return [NSString stringWithFormat:@"%@ %@", lastName, firstName];
-			}
-		}
-	}
-}
-
-- (NSString *)secondaryCompositeName {
-	if (!self.isCompany) {
-		return self.company;
-	} else {
-		NSString *firstName = (self.firstName?self.firstName:@"");
-		NSString *lastName = (self.lastName?self.lastName:@"");
-		if (ABPersonGetCompositeNameFormat() == kABPersonCompositeNameFormatFirstNameFirst) {
-			return [NSString stringWithFormat:@"%@ %@", firstName, lastName];
-		} else {
-			return [NSString stringWithFormat:@"%@ %@", lastName, firstName];
-		}
-	}
-}
-
-
-
 - (NSArray *)phoneNumbers {
 	/*
 	ABRecordRef record = self.addressbookRecord;

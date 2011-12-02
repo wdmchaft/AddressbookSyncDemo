@@ -5,6 +5,7 @@
 //  Created by Tom Fewster on 28/11/2011.
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
 //
+//#define MULTI_THREADED 1
 
 #import "_Contact.h"
 
@@ -27,6 +28,15 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 @synthesize addressbookIdentifier;
 @synthesize addressbookRecord;
 
++ (NSOperationQueue *)sharedOperationQueue {
+	static dispatch_once_t onceToken = 0;
+	__strong static NSOperationQueue *_operationQueue = nil;
+	dispatch_once(&onceToken, ^{
+		_operationQueue = [[NSOperationQueue alloc] init];
+	});
+	return _operationQueue;
+}
+
 + (NSSet *)keyPathsForValuesAffectingValueForKey:(NSString *)key {
 	if ([key isEqualToString:@"compositeName"]) {
 		return [NSSet setWithObjects:@"firstName", @"lastName", @"comapny", nil];
@@ -38,8 +48,16 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 }
 
 + (Contact *)findContactForRecordId:(TFRecordID)recordId {
-	NSString *addressbookIdentifier = [NSString stringWithFormat:@"%d", recordId];
-	return (Contact *)[[ContactMappingCache sharedInstance] contactObjectForIdentifier:addressbookIdentifier];
+	return (Contact *)[[ContactMappingCache sharedInstance] contactObjectForIdentifier:recordId];
+}
+
++ (TFAddressBook *)sharedAddressBook {
+	static dispatch_once_t onceToken = 0;
+	__strong static TFAddressBook *_addressbook = nil;
+	dispatch_once(&onceToken, ^{
+		_addressbook = [TFAddressBook addressBook];
+	});
+	return _addressbook;
 }
 
 - (void)awakeFromFetch {
@@ -53,23 +71,24 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 			self.addressbookIdentifier = 0;
 			[[ContactMappingCache sharedInstance] removeIdentifierForContact:self];
 			[[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:kContactSyncStateChangedNotification object:self  userInfo:[NSDictionary dictionaryWithObject:self forKey:NSUpdatedObjectsKey]]];
-			[(NSObject<Contact> *)self syncAddressbookRecord];
+			[self syncAddressbookRecord];
 		} else {
-			if ([(NSObject<Contact> *)self isContactOlderThanAddressbookRecord:self.addressbookRecord]) {
+			if ([self isContactOlderThanAddressbookRecord:self.addressbookRecord]) {
 				NSLog(@"Addressbook contact is newer, we need to update our cache");
-				[(NSObject<Contact> *)self updateManagedObjectWithAddressbookRecordDetails];
+				[self updateManagedObjectWithAddressbookRecordDetails];
 			}
 			_addressbookCacheState = kAddressbookCacheLoaded;
 			NSLog(@"Contact '%@' loaded", self.compositeName);
 		}
 	} else {
 		NSLog(@"Contact '%@' has no identifier in the mapping yet", self.compositeName);
-
+#ifdef MULTI_THREADED
 		[[_Contact sharedOperationQueue] addOperationWithBlock:^{
-			[(NSObject<Contact> *)self syncAddressbookRecord];
+			[self syncAddressbookRecord];
 		}];
-
-		//[(NSObject<Contact> *)self syncAddressbookRecord];
+#else
+		[self syncAddressbookRecord];
+#endif
 	}
 }
 
@@ -84,7 +103,7 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 		[[ContactMappingCache sharedInstance] removeIdentifierForContact:self];
 	} else if (self.addressbookIdentifier) {
 		NSLog(@"Adding/Updating identifier in Contacts Mapping");
-		[[ContactMappingCache sharedInstance] setIdentifier:[NSString stringWithFormat:@"%d", self.addressbookIdentifier] forContact:self];
+		[[ContactMappingCache sharedInstance] setIdentifier:self.addressbookIdentifier forContact:self];
 	}	
 }
 
@@ -104,7 +123,7 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 	TFRecord * record;
 	if (!self.addressbookRecord) {
 		if (self.addressbookIdentifier) {
-			record = [[TFAddressBook sharedAddressBook] recordForUniqueId:self.addressbookIdentifier];
+			record = [[[self class] sharedAddressBook] recordForUniqueId:self.addressbookIdentifier];
 			if (record == nil) { // i.e. we couldn't find the record
 				NSLog(@"The value we had for addressbook identifier was incorrect (contact didn't exist)");
 				self.addressbookIdentifier = 0;
@@ -131,7 +150,10 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 
 
 - (TFRecord *)addressbookRecord {
-	return [[TFAddressBook sharedAddressBook] recordForUniqueId:self.addressbookIdentifier];
+	if (self.addressbookIdentifier != nil) {
+		return [[[self class] sharedAddressBook] recordForUniqueId:self.addressbookIdentifier];
+	}
+	return nil;
 }
 
 - (void)updateManagedObjectWithAddressbookRecordDetails {
@@ -204,8 +226,8 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 			
 			// Filter out everyone who matches these properties & doesn't currently have a mapping to a existing Contact
 			NSArray *filteredPeople = [people filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary *bindings) {
-				NSInteger personFlags = [[(ABPerson *)evaluatedObject valueForProperty:kABPersonFlags] integerValue];
-				return (self.isCompany == (personFlags & kABShowAsCompany));
+				NSInteger personFlags = [[(TFPerson *)evaluatedObject valueForProperty:kTFPersonFlags] integerValue];
+				return (self.isCompany == (personFlags & kTFShowAsCompany));
 			}]];
 			
 			NSUInteger count = [filteredPeople count];
@@ -216,7 +238,7 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 				return kAddressbookSyncMatchFailed;
 			} else if (count == 1) {
 				self.addressbookIdentifier = [[filteredPeople lastObject] uniqueId];
-				[[ContactMappingCache sharedInstance] setIdentifier:[NSString stringWithFormat:@"%d", self.addressbookIdentifier] forContact:self];
+				[[ContactMappingCache sharedInstance] setIdentifier:self.addressbookIdentifier forContact:self];
 				// we need to update our managed object back on the main thread
 				if ([NSOperationQueue mainQueue] != [NSOperationQueue currentQueue]) {
 					[[NSOperationQueue mainQueue] addOperationWithBlock:^{
@@ -226,14 +248,22 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 				} else {
 					[self updateManagedObjectWithAddressbookRecordDetails];
 				}
+#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+				NSLog(@"Match on '%@' [%d]", self.compositeName, [self.addressbookRecord uniqueId]);
+#else
 				NSLog(@"Match on '%@' [%@]", self.compositeName, [self.addressbookRecord uniqueId]);
+#endif
 				return kAddressbookSyncMatchFound;
 			} else {
 				NSLog(@"Ambigous results found");			
 				TFRecord *record;
 				for (NSUInteger i = 0; i < [filteredPeople count]; i++) {
 					record = [filteredPeople objectAtIndex:i];
+#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+					NSLog(@"Match on '%@ %@/%@' [%d]", [record valueForProperty:kTFFirstNameProperty], [record valueForProperty:kTFLastNameProperty], [record  valueForProperty:kTFOrganizationProperty], [record uniqueId]);
+#else
 					NSLog(@"Match on '%@ %@/%@' [%@]", [record valueForProperty:kTFFirstNameProperty], [record valueForProperty:kTFLastNameProperty], [record  valueForProperty:kTFOrganizationProperty], [record uniqueId]);
+#endif
 				}
 				_ambigousPossibleMatches = filteredPeople;
 				_addressbookCacheState = kAddressbookCacheLoadAmbigous;
@@ -246,6 +276,42 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 	}
 }
 
+- (NSString *)compositeName {
+	if (self.isCompany) {
+		return self.company;
+	} else {
+		NSString *firstName = (self.firstName?self.firstName:@"");
+		NSString *lastName = (self.lastName?self.lastName:@"");
+		if ([[[self class] sharedAddressBook] defaultNameOrdering] == kTFFirstNameFirst) {
+			return [NSString stringWithFormat:@"%@ %@", firstName, lastName];
+		} else {
+			return [NSString stringWithFormat:@"%@ %@", lastName, firstName];
+		}
+	}
+}
+
+- (NSString *)helpfullText {
+#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+	return self.addressbookIdentifier?[NSString stringWithFormat:@"%d ['%@', '%@'] - '%@'", self.addressbookIdentifier, self.sortTag1, self.sortTag2, self.groupingIndexCharacter]:@"Contact not found";
+#else
+	return self.addressbookIdentifier?[NSString stringWithFormat:@"%@ ['%@', '%@'] - '%@'", self.addressbookIdentifier, self.sortTag1, self.sortTag2, self.groupingIndexCharacter]:@"Contact not found";
+#endif
+}
+
+
+- (NSString *)secondaryCompositeName {
+	if (!self.isCompany) {
+		return self.company;
+	} else {
+		NSString *firstName = (self.firstName?self.firstName:@"");
+		NSString *lastName = (self.lastName?self.lastName:@"");
+		if ([[[self class] sharedAddressBook] defaultNameOrdering] == kTFFirstNameFirst) {
+			return [NSString stringWithFormat:@"%@ %@", firstName, lastName];
+		} else {
+			return [NSString stringWithFormat:@"%@ %@", lastName, firstName];
+		}
+	}
+}
 
 - (NSString *)groupingIndexCharacter {
 	NSString *result = nil;
@@ -386,18 +452,26 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 	}
 }
 
-- (NSString *)identifierForContact:(_Contact *)contact {
+- (TFRecordID)identifierForContact:(_Contact *)contact {
 	@synchronized(self) {
 		NSString *key = [[contact.objectID URIRepresentation] absoluteString];
+#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+		return [[_mappings objectForKey:key] integerValue];
+#else
 		return [_mappings objectForKey:key];
+#endif
 	}
 }
 
-- (void)setIdentifier:(NSString *)identifier forContact:(_Contact *)contact {
+- (void)setIdentifier:(TFRecordID)identifier forContact:(_Contact *)contact {
 	NSString *key = [[contact.objectID URIRepresentation] absoluteString];
 	@synchronized(self) {
 		NSMutableDictionary *newMappings = [NSMutableDictionary dictionaryWithDictionary:_mappings];
+#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+		[newMappings setObject:[NSString stringWithFormat:@"%d", identifier] forKey:key];
+#else
 		[newMappings setObject:identifier forKey:key];
+#endif
 		_mappings = [NSDictionary dictionaryWithDictionary:newMappings];
 	}
 	_changed = YES;
@@ -413,13 +487,25 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 	_changed = YES;
 }
 
-- (BOOL)contactExistsForIdentifier:(NSString *)identifier {
+- (BOOL)contactExistsForIdentifier:(TFRecordID)identifier {
 	@synchronized(self) {
-		return [[_mappings allValues] containsObject:identifier];
+		NSString *search = nil;
+#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+		search = [NSString stringWithFormat:@"%d", identifier];
+#else
+		search = identifier;
+#endif
+		return [[_mappings allValues] containsObject:search];
 	}
 }
 
-- (_Contact *)contactObjectForIdentifier:(NSString *)identifier {
+- (_Contact *)contactObjectForIdentifier:(TFRecordID)uniqueID {
+	NSString *identifier = nil;
+#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+	identifier = [NSString stringWithFormat:@"%d", uniqueID];
+#else
+	identifier = uniqueID;
+#endif
 	if ([self contactExistsForIdentifier:identifier]) {
 		@synchronized(self) {
 			for (NSString *urlAsString in [_mappings allKeys]) {
