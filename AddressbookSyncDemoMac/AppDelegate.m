@@ -8,6 +8,7 @@
 
 #import "AppDelegate.h"
 #import "Contact.h"
+#import "NSObject+BlockExtensions.h"
 
 @implementation AppDelegate
 
@@ -18,6 +19,8 @@
 @synthesize personView;
 @synthesize contactSelectionIndex;
 @synthesize arrayController;
+@synthesize searchFilter;
+
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
@@ -195,12 +198,47 @@
     return NSTerminateNow;
 }
 
+- (void)resolveMissingContact:(Contact *)contact {
+	if (contact.addressbookCacheState == kAddressbookCacheLoadFailed) {
+		NSLog(@"Contact not found");
+	} else if (contact.addressbookCacheState == kAddressbookCacheLoadAmbigous) {
+		NSLog(@"Contact Ambigous");
+	} else if (contact.addressbookCacheState == kAddressbookCacheLoaded) {
+		NSLog(@"Or contact has probably been deleted since we cached it");
+	} else if (contact.addressbookCacheState == kAddressbookCacheCurrentlyLoading) {
+		// lets try again in a 1/2 a second
+		[self performBlock:^{
+			[self resolveMissingContact:contact];	
+		} afterDelay:0.5];
+	} else if (contact.addressbookCacheState == kAddressbookCacheLoaded && contact.addressbookRecord != NULL) {
+		[personView setPerson:(ABPerson *)contact.addressbookRecord];
+	}
+}
+
 - (void)setContactSelectionIndex:(NSIndexSet *)value {
 	contactSelectionIndex = value;
 	if ([contactSelectionIndex count] != 0) {
 		Contact *contact = [[arrayController arrangedObjects] objectAtIndex:[contactSelectionIndex firstIndex]];
-		[contact firstName];
-		[personView setPerson:(ABPerson *)contact.addressbookRecord];
+		if (contact.addressbookRecord == NULL) {
+			// Somthing is wrong, lets try to resolve it
+			[self resolveMissingContact:contact];
+		} else {
+			[personView setPerson:(ABPerson *)contact.addressbookRecord];
+		}
+	}
+}
+
+- (NSArray *)sortDescriptors {
+	return [NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"sortTag2" ascending:YES]];
+}
+
+- (IBAction)toggelEdit:(NSButton *)button {
+	if (personView.editing) {
+		personView.editing = NO;
+		button.title = @"Edit";
+	} else {
+		personView.editing = YES;
+		button.title = @"Done";
 	}
 }
 
