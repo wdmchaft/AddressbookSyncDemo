@@ -115,7 +115,6 @@
             [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(mergeChangesFrom_iCloud:) name:NSPersistentStoreDidImportUbiquitousContentChangesNotification object:coordinator];
         }];
 		
-#warning We ideally don't want this....
 		[__managedObjectContext setMergePolicy:NSMergeByPropertyStoreTrumpMergePolicy];
         __managedObjectContext = moc;
     }
