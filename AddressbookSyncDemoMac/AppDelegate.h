@@ -20,6 +20,9 @@
 @property (weak) IBOutlet ABPersonView *personView;
 @property (weak) IBOutlet NSArrayController *arrayController;
 
+@property (weak, readonly, nonatomic) NSArray *sortDescriptors;
+@property (strong) NSPredicate *searchFilter;
+
 - (IBAction)saveAction:(id)sender;
 
 @end
