@@ -244,22 +244,14 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 				} else {
 					[self updateManagedObjectWithAddressbookRecordDetails];
 				}
-#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-				NSLog(@"Match on '%@' [%d]", self.compositeName, [self.addressbookRecord uniqueId]);
-#else
 				NSLog(@"Match on '%@' [%@]", self.compositeName, [self.addressbookRecord uniqueId]);
-#endif
 				return kAddressbookSyncMatchFound;
 			} else {
 				NSLog(@"Ambigous results found");			
 				TFRecord *record;
 				for (NSUInteger i = 0; i < [filteredPeople count]; i++) {
 					record = [filteredPeople objectAtIndex:i];
-#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-					NSLog(@"Match on '%@ %@/%@' [%d]", [record valueForProperty:kTFFirstNameProperty], [record valueForProperty:kTFLastNameProperty], [record  valueForProperty:kTFOrganizationProperty], [record uniqueId]);
-#else
 					NSLog(@"Match on '%@ %@/%@' [%@]", [record valueForProperty:kTFFirstNameProperty], [record valueForProperty:kTFLastNameProperty], [record  valueForProperty:kTFOrganizationProperty], [record uniqueId]);
-#endif
 				}
 				_ambigousPossibleMatches = filteredPeople;
 				_addressbookCacheState = kAddressbookCacheLoadAmbigous;
@@ -287,11 +279,7 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 }
 
 - (NSString *)helpfullText {
-#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-	return self.addressbookIdentifier?[NSString stringWithFormat:@"%d ['%@', '%@'] - '%@'", self.addressbookIdentifier, self.sortTag1, self.sortTag2, self.groupingIndexCharacter]:@"Contact not found";
-#else
 	return self.addressbookIdentifier?[NSString stringWithFormat:@"%@ ['%@', '%@'] - '%@'", self.addressbookIdentifier, self.sortTag1, self.sortTag2, self.groupingIndexCharacter]:@"Contact not found";
-#endif
 }
 
 
@@ -451,11 +439,7 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 - (TFRecordID)identifierForContact:(_Contact *)contact {
 	@synchronized(self) {
 		NSString *key = [[contact.objectID URIRepresentation] absoluteString];
-#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-		return [[_mappings objectForKey:key] integerValue];
-#else
 		return [_mappings objectForKey:key];
-#endif
 	}
 }
 
@@ -463,11 +447,7 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 	NSString *key = [[contact.objectID URIRepresentation] absoluteString];
 	@synchronized(self) {
 		NSMutableDictionary *newMappings = [NSMutableDictionary dictionaryWithDictionary:_mappings];
-#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-		[newMappings setObject:[NSString stringWithFormat:@"%d", identifier] forKey:key];
-#else
 		[newMappings setObject:identifier forKey:key];
-#endif
 		_mappings = [NSDictionary dictionaryWithDictionary:newMappings];
 	}
 	_changed = YES;
@@ -486,11 +466,7 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 - (BOOL)contactExistsForIdentifier:(TFRecordID)identifier {
 	@synchronized(self) {
 		NSString *search = nil;
-#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-		search = [NSString stringWithFormat:@"%d", identifier];
-#else
 		search = identifier;
-#endif
 		return [[_mappings allValues] containsObject:search];
 	}
 }
@@ -499,11 +475,7 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 	if ([self contactExistsForIdentifier:uniqueID]) {
 		@synchronized(self) {
 			NSString *identifier = nil;
-#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-			identifier = [NSString stringWithFormat:@"%d", uniqueID];
-#else
 			identifier = uniqueID;
-#endif
 			for (NSString *urlAsString in [_mappings allKeys]) {
 				if ([[_mappings valueForKey:urlAsString] isEqualToString:identifier]) {
 					NSError *error = nil;
