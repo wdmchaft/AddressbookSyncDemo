@@ -28,7 +28,7 @@
 
 - (IBAction)done:(id)sender {
 	TFRecord *record = [contact.ambigousContactMatches objectAtIndex:[self.tableView indexPathForSelectedRow].row];
-	[contact resolveConflictWithAddressbookRecord:record];
+	[contact resolveConflictWithAddressbookRecordId:[record uniqueId]];
 	[self dismissModalViewControllerAnimated:YES];
 }
 

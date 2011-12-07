@@ -9,6 +9,9 @@
 #import "AppDelegate.h"
 #import "Contact.h"
 #import "NSObject+BlockExtensions.h"
+#import "TFABAddressBook.h"
+#import "AmbigousContactResolverViewController.h"
+#import "UnresolvedContactResolverViewController.h"
 
 @implementation AppDelegate
 
@@ -20,12 +23,17 @@
 @synthesize contactSelectionIndex;
 @synthesize arrayController;
 @synthesize searchFilter;
+@synthesize ambigousContactResolver;
+@synthesize unresolvedContactResolver;
 
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
 	// Insert code here to initialize your application
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveAction:) name:NSApplicationWillResignActiveNotification object:nil];
+	[TFAddressBook sharedAddressBook];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(contactUpdated:) name:kTFDatabaseChangedExternallyNotification object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(contactUpdated:) name:kTFDatabaseChangedNotification object:nil];
 }
 
 /**
@@ -201,10 +209,15 @@
 - (void)resolveMissingContact:(Contact *)contact {
 	if (contact.addressbookCacheState == kAddressbookCacheLoadFailed) {
 		NSLog(@"Contact not found");
+		[unresolvedContactResolver resolveConflict:contact];
+		[personView setPerson:nil];
 	} else if (contact.addressbookCacheState == kAddressbookCacheLoadAmbigous) {
 		NSLog(@"Contact Ambigous");
+		[ambigousContactResolver resolveConflict:contact];
+		[personView setPerson:nil];
 	} else if (contact.addressbookCacheState == kAddressbookCacheLoaded) {
 		NSLog(@"Or contact has probably been deleted since we cached it");
+		[contact updateManagedObjectWithAddressbookRecordDetails];
 	} else if (contact.addressbookCacheState == kAddressbookCacheCurrentlyLoading) {
 		// lets try again in a 1/2 a second
 		[self performBlock:^{
@@ -235,11 +248,34 @@
 - (IBAction)toggelEdit:(NSButton *)button {
 	if (personView.editing) {
 		personView.editing = NO;
+		if ([[Contact sharedAddressBook] hasUnsavedChanges]) {
+			[[Contact sharedAddressBook] save];
+		}
 		button.title = @"Edit";
 	} else {
 		personView.editing = YES;
 		button.title = @"Done";
 	}
 }
+
+-(void)contactUpdated:(NSNotification *)notification {
+	
+	for (NSString *recordId in [[notification userInfo] objectForKey:kTFUpdatedRecords]) {
+		Contact *contact = (Contact *)[Contact findContactForRecordId:recordId];
+		if (contact) {
+			NSLog(@"Our contact has been updated");
+			[contact updateManagedObjectWithAddressbookRecordDetails];
+		}
+	}
+	
+	for (NSString *recordId in [[notification userInfo] objectForKey:kTFDeletedRecords]) {
+		Contact *contact = (Contact *)[Contact findContactForRecordId:recordId];
+		if (contact) {
+			NSLog(@"Our contact has been removed from the addressbook");
+			[contact updateManagedObjectWithAddressbookRecordDetails];
+		}
+	}
+}
+
 
 @end

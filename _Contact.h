@@ -59,7 +59,7 @@ extern NSString *kContactSyncStateChangedNotification;
 @property (nonatomic, strong) NSString * sortTag1;
 @property (nonatomic, strong) NSString * sortTag2;
 
-@property (nonatomic, readonly) AddressbookCacheState addressbookCacheState;
+@property (assign, getter=addressbookCacheState) AddressbookCacheState _addressbookCacheState;
 @property (nonatomic, readonly) NSArray *ambigousContactMatches;
 
 @property (weak, nonatomic, readonly) NSString *compositeName;
@@ -77,12 +77,13 @@ extern NSString *kContactSyncStateChangedNotification;
 
 + (_Contact *)findContactForRecordId:(TFRecordID)recordId;
 + (NSOperationQueue *)sharedOperationQueue;
++ (TFAddressBook *)sharedAddressBook;
 
 - (void)updateManagedObjectWithAddressbookRecordDetails;
 - (BOOL)isContactOlderThanAddressbookRecord:(TFRecord *)record;
 - (TFRecord *)findAddressbookRecord;
 - (AddressbookResyncResults)syncAddressbookRecord;
-- (void)resolveConflictWithAddressbookRecord:(TFRecord *)record;
+- (void)resolveConflictWithAddressbookRecordId:(TFRecordID)recordId;
 
 @end
 

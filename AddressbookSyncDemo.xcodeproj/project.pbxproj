@@ -36,7 +36,14 @@
 		E27357EE148427AA00BCE1BB /* SelectContact.xib in Resources */ = {isa = PBXBuildFile; fileRef = E27357ED148427AA00BCE1BB /* SelectContact.xib */; };
 		E27357F21484285800BCE1BB /* SelectContactSheetController.m in Sources */ = {isa = PBXBuildFile; fileRef = E27357F11484285800BCE1BB /* SelectContactSheetController.m */; };
 		E2B3D6D7148AB92B0004F4D1 /* AmbigousContactResolver.xib in Resources */ = {isa = PBXBuildFile; fileRef = E2B3D6D6148AB92B0004F4D1 /* AmbigousContactResolver.xib */; };
-		E2B3D6DB148C03E80004F4D1 /* ContactArrayController.m in Sources */ = {isa = PBXBuildFile; fileRef = E2B3D6DA148C03E80004F4D1 /* ContactArrayController.m */; };
+		E2B3D6DF148C19820004F4D1 /* AmbigousContactResolverViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E2B3D6DD148C19820004F4D1 /* AmbigousContactResolverViewController.m */; };
+		E2B3D6E6148F792F0004F4D1 /* TFPerson+CompositeName.m in Sources */ = {isa = PBXBuildFile; fileRef = E2B3D6E5148F792F0004F4D1 /* TFPerson+CompositeName.m */; };
+		E2B3D6E7148F792F0004F4D1 /* TFPerson+CompositeName.m in Sources */ = {isa = PBXBuildFile; fileRef = E2B3D6E5148F792F0004F4D1 /* TFPerson+CompositeName.m */; };
+		E2B3D6EB148FD9A40004F4D1 /* EmptyNSArrayControllerSelectionValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = E2B3D6E9148FD9A30004F4D1 /* EmptyNSArrayControllerSelectionValueTransformer.m */; };
+		E2B3D6EE148FF4B70004F4D1 /* CompositeNameValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = E2B3D6ED148FF4B70004F4D1 /* CompositeNameValueTransformer.m */; };
+		E2B3D6F0148FFE1D0004F4D1 /* UnresolvedContactResolver.xib in Resources */ = {isa = PBXBuildFile; fileRef = E2B3D6EF148FFE1D0004F4D1 /* UnresolvedContactResolver.xib */; };
+		E2B3D6F3148FFED10004F4D1 /* UnresolvedContactResolverViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E2B3D6F2148FFED00004F4D1 /* UnresolvedContactResolverViewController.m */; };
+		E2B3D6F6149008550004F4D1 /* ContactArrayController.m in Sources */ = {isa = PBXBuildFile; fileRef = E2B3D6F5149008540004F4D1 /* ContactArrayController.m */; };
 		E2BB1DE0147D3CCC002263D0 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E2BB1DDF147D3CCC002263D0 /* UIKit.framework */; };
 		E2BB1DE2147D3CCC002263D0 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E2BB1DE1147D3CCC002263D0 /* Foundation.framework */; };
 		E2BB1DE4147D3CCC002263D0 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E2BB1DE3147D3CCC002263D0 /* CoreGraphics.framework */; };
@@ -110,8 +117,19 @@
 		E27357F01484285800BCE1BB /* SelectContactSheetController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SelectContactSheetController.h; sourceTree = "<group>"; };
 		E27357F11484285800BCE1BB /* SelectContactSheetController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SelectContactSheetController.m; sourceTree = "<group>"; };
 		E2B3D6D6148AB92B0004F4D1 /* AmbigousContactResolver.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AmbigousContactResolver.xib; sourceTree = "<group>"; };
-		E2B3D6D9148C03E80004F4D1 /* ContactArrayController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ContactArrayController.h; sourceTree = "<group>"; };
-		E2B3D6DA148C03E80004F4D1 /* ContactArrayController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ContactArrayController.m; sourceTree = "<group>"; };
+		E2B3D6DC148C19820004F4D1 /* AmbigousContactResolverViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AmbigousContactResolverViewController.h; sourceTree = "<group>"; };
+		E2B3D6DD148C19820004F4D1 /* AmbigousContactResolverViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AmbigousContactResolverViewController.m; sourceTree = "<group>"; };
+		E2B3D6E4148F792F0004F4D1 /* TFPerson+CompositeName.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "TFPerson+CompositeName.h"; sourceTree = "<group>"; };
+		E2B3D6E5148F792F0004F4D1 /* TFPerson+CompositeName.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "TFPerson+CompositeName.m"; sourceTree = "<group>"; };
+		E2B3D6E8148FD9A30004F4D1 /* EmptyNSArrayControllerSelectionValueTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EmptyNSArrayControllerSelectionValueTransformer.h; sourceTree = "<group>"; };
+		E2B3D6E9148FD9A30004F4D1 /* EmptyNSArrayControllerSelectionValueTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EmptyNSArrayControllerSelectionValueTransformer.m; sourceTree = "<group>"; };
+		E2B3D6EC148FF4B60004F4D1 /* CompositeNameValueTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CompositeNameValueTransformer.h; sourceTree = "<group>"; };
+		E2B3D6ED148FF4B70004F4D1 /* CompositeNameValueTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CompositeNameValueTransformer.m; sourceTree = "<group>"; };
+		E2B3D6EF148FFE1D0004F4D1 /* UnresolvedContactResolver.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UnresolvedContactResolver.xib; sourceTree = "<group>"; };
+		E2B3D6F1148FFED00004F4D1 /* UnresolvedContactResolverViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UnresolvedContactResolverViewController.h; sourceTree = "<group>"; };
+		E2B3D6F2148FFED00004F4D1 /* UnresolvedContactResolverViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UnresolvedContactResolverViewController.m; sourceTree = "<group>"; };
+		E2B3D6F4149008540004F4D1 /* ContactArrayController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ContactArrayController.h; sourceTree = "<group>"; };
+		E2B3D6F5149008540004F4D1 /* ContactArrayController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ContactArrayController.m; sourceTree = "<group>"; };
 		E2BB1DDB147D3CCC002263D0 /* AddressbookSyncDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AddressbookSyncDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E2BB1DDF147D3CCC002263D0 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		E2BB1DE1147D3CCC002263D0 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -186,6 +204,8 @@
 				E23A73961487E1B0001AE253 /* iOS */,
 				E23A73A91487E1B0001AE253 /* Mac */,
 				E23A73BA1487E1B0001AE253 /* TFABAddressBook.h */,
+				E2B3D6E4148F792F0004F4D1 /* TFPerson+CompositeName.h */,
+				E2B3D6E5148F792F0004F4D1 /* TFPerson+CompositeName.m */,
 			);
 			name = TFAddressBook;
 			sourceTree = "<group>";
@@ -228,6 +248,8 @@
 		E27357AE1482D7B700BCE1BB /* AddressbookSyncDemoMac */ = {
 			isa = PBXGroup;
 			children = (
+				E2B3D6F4149008540004F4D1 /* ContactArrayController.h */,
+				E2B3D6F5149008540004F4D1 /* ContactArrayController.m */,
 				E27357BA1482D7B700BCE1BB /* AppDelegate.h */,
 				E27357BB1482D7B700BCE1BB /* AppDelegate.m */,
 				E27357BD1482D7B700BCE1BB /* MainMenu.xib */,
@@ -237,8 +259,15 @@
 				E27357F01484285800BCE1BB /* SelectContactSheetController.h */,
 				E27357F11484285800BCE1BB /* SelectContactSheetController.m */,
 				E2B3D6D6148AB92B0004F4D1 /* AmbigousContactResolver.xib */,
-				E2B3D6D9148C03E80004F4D1 /* ContactArrayController.h */,
-				E2B3D6DA148C03E80004F4D1 /* ContactArrayController.m */,
+				E2B3D6DC148C19820004F4D1 /* AmbigousContactResolverViewController.h */,
+				E2B3D6DD148C19820004F4D1 /* AmbigousContactResolverViewController.m */,
+				E2B3D6EF148FFE1D0004F4D1 /* UnresolvedContactResolver.xib */,
+				E2B3D6F1148FFED00004F4D1 /* UnresolvedContactResolverViewController.h */,
+				E2B3D6F2148FFED00004F4D1 /* UnresolvedContactResolverViewController.m */,
+				E2B3D6E8148FD9A30004F4D1 /* EmptyNSArrayControllerSelectionValueTransformer.h */,
+				E2B3D6E9148FD9A30004F4D1 /* EmptyNSArrayControllerSelectionValueTransformer.m */,
+				E2B3D6EC148FF4B60004F4D1 /* CompositeNameValueTransformer.h */,
+				E2B3D6ED148FF4B70004F4D1 /* CompositeNameValueTransformer.m */,
 			);
 			path = AddressbookSyncDemoMac;
 			sourceTree = "<group>";
@@ -454,6 +483,7 @@
 				E27357BF1482D7B700BCE1BB /* MainMenu.xib in Resources */,
 				E27357EE148427AA00BCE1BB /* SelectContact.xib in Resources */,
 				E2B3D6D7148AB92B0004F4D1 /* AmbigousContactResolver.xib in Resources */,
+				E2B3D6F0148FFE1D0004F4D1 /* UnresolvedContactResolver.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -483,7 +513,12 @@
 				E27357E71483812C00BCE1BB /* Contact.m in Sources */,
 				E27357F21484285800BCE1BB /* SelectContactSheetController.m in Sources */,
 				E2CD24AC1484C5EA00550386 /* _PhoneNumber.m in Sources */,
-				E2B3D6DB148C03E80004F4D1 /* ContactArrayController.m in Sources */,
+				E2B3D6DF148C19820004F4D1 /* AmbigousContactResolverViewController.m in Sources */,
+				E2B3D6E7148F792F0004F4D1 /* TFPerson+CompositeName.m in Sources */,
+				E2B3D6EB148FD9A40004F4D1 /* EmptyNSArrayControllerSelectionValueTransformer.m in Sources */,
+				E2B3D6EE148FF4B70004F4D1 /* CompositeNameValueTransformer.m in Sources */,
+				E2B3D6F3148FFED10004F4D1 /* UnresolvedContactResolverViewController.m in Sources */,
+				E2B3D6F6149008550004F4D1 /* ContactArrayController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -515,6 +550,7 @@
 				E23A73C51487E1B0001AE253 /* TFPerson.m in Sources */,
 				E23A73C71487E1B0001AE253 /* TFRecord.m in Sources */,
 				E23A73C91487E1B0001AE253 /* TFSearchElement.m in Sources */,
+				E2B3D6E6148F792F0004F4D1 /* TFPerson+CompositeName.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -11,6 +11,7 @@
 @implementation ContactArrayController
 
 - (BOOL)fetchWithRequest:(NSFetchRequest *)fetchRequest merge:(BOOL)merge error:(NSError **)error {
+	fetchRequest.returnsObjectsAsFaults = YES;
 	return [super fetchWithRequest:fetchRequest merge:merge error:error];
 }
 @end

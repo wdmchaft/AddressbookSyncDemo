@@ -8,3 +8,5 @@ AddressbookSyncDemo.xcodeproj/project.xcworkspace/xcuserdata/tom.xcuserdatad/Use
 .DS_Store
 
 AddressbookSyncDemo.xcodeproj/xcuserdata/tom.xcuserdatad/xcdebugger/Breakpoints.xcbkptlist
+
+AddressbookSyncDemoMac/ContactArrayController.m

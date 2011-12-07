@@ -26,7 +26,7 @@
     NSString *key = [[[_contactSectionIndexDictionary allKeys] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)] objectAtIndex:indexPath.section];
 	TFRecord *record = [[_contactSectionIndexDictionary objectForKey:key] objectAtIndex:indexPath.row];
 
-	[contact resolveConflictWithAddressbookRecord:record];
+	[contact resolveConflictWithAddressbookRecordId:[record uniqueId]];
 	[self dismissModalViewControllerAnimated:YES];
 }
 

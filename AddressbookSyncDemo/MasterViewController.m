@@ -411,7 +411,8 @@
 	[self dismissModalViewControllerAnimated:YES];
 	
 	// Check if we already have this contact in out object tree
-	if ([Contact findContactForRecordId:ABRecordGetRecordID(person)] != nil) {
+	NSString *uniqueId = [NSString stringWithFormat:@"%d", ABRecordGetRecordID(person)];
+	if ([Contact findContactForRecordId:uniqueId] != nil) {
 		[self performBlock:^{
 			UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Add Contact Failed" message:@"Contact already exists" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
 			[alert show];
@@ -420,7 +421,7 @@
 	}
 	
 	// Add this contact to the Object Graph
-	Contact *contact = [Contact initContactWithAddressbookRecord:[[TFPerson alloc] initWithRef:person]];
+	Contact *contact = [Contact initContactWithAddressbookRecord:[[TFPerson alloc] initWithRef:person addressbook:[TFAddressBook sharedAddressBook]]];
 	NSLog(@"Adding %@", [contact compositeName]);
 	
 	[(AppDelegate *)[UIApp delegate] saveContext];

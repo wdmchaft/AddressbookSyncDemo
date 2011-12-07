@@ -1,8 +1,8 @@
 //
-//  AmbigousContactResolverViewController.h
+//  UnresolvedContactResolver.h
 //  AddressbookSyncDemo
 //
-//  Created by Tom Fewster on 04/12/2011.
+//  Created by Tom Fewster on 07/12/2011.
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
 //
 
@@ -12,9 +12,7 @@
 @class Contact;
 @class ABPersonView;
 
-@interface AmbigousContactResolverViewController : NSViewController {
-	TFAddressBook *addressbook;
-}
+@interface UnresolvedContactResolverViewController : NSViewController
 
 @property (nonatomic, strong) IBOutlet NSWindow *documentWindow;
 @property (nonatomic, strong) IBOutlet NSPanel *objectSheet;
@@ -27,6 +25,5 @@
 - (IBAction)resolveConflict:(Contact *)contact;
 - (IBAction)later:(id)sender;
 - (IBAction)resolve:(id)sender;
-
 
 @end
