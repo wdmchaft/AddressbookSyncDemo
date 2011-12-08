@@ -9,4 +9,6 @@ AddressbookSyncDemo.xcodeproj/project.xcworkspace/xcuserdata/tom.xcuserdatad/Use
 
 AddressbookSyncDemo.xcodeproj/xcuserdata/tom.xcuserdatad/xcdebugger/Breakpoints.xcbkptlist
 
-AddressbookSyncDemoMac/ContactArrayController.m
+AddressbookSyncDemoMac/.Contact.m.swp
+
+AddressbookSyncDemoMac/Contact.m~

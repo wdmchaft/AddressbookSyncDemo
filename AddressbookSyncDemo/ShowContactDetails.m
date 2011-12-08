@@ -33,7 +33,7 @@
 	if (self.contact.addressbookIdentifier) {
 		ABAddressBookRef addressBook = ABAddressBookCreate();
 		
-		ABRecordID recordId = self.contact.addressbookIdentifier;
+		ABRecordID recordId = [self.contact.addressbookIdentifier integerValue];
 		if (recordId == 0 && (errno == EINVAL || errno == ERANGE)) {
 			NSLog(@"'%@' isn't a valid record id", self.contact.addressbookIdentifier);
 			return [self displayTemplateForUnknownContact];

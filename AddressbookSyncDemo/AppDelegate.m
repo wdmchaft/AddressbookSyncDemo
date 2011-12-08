@@ -10,6 +10,7 @@
 
 #import "MasterViewController.h"
 #import "ContactSyncHandler.h"
+#import "TFABAddressBook.h"
 
 @implementation AppDelegate
 
@@ -37,6 +38,9 @@
 	    MasterViewController *controller = (MasterViewController *)navigationController.topViewController;
 	    controller.managedObjectContext = self.managedObjectContext;
 	}
+	
+	[TFAddressBook sharedAddressBook];
+	
     return YES;
 }
 							
