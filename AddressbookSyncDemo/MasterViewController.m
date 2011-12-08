@@ -211,7 +211,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	Contact *selectedObject = [[self fetchedResultsController] objectAtIndexPath:indexPath];
-	NSLog(@"Contact: %@ {%@}", selectedObject.compositeName, selectedObject.phoneNumbers);
+	NSLog(@"Contact: %@ {%@} {%@}", selectedObject.compositeName, selectedObject.phoneNumbers, selectedObject.emailAddresses);
 	
 	if (selectedObject.addressbookRecord == NULL) {
 		// Somthing is wrong, lets try to resolve it

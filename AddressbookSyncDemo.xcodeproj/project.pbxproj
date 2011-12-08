@@ -64,9 +64,10 @@
 		E2BB1E1B147D7E59002263D0 /* ShowContactDetails.m in Sources */ = {isa = PBXBuildFile; fileRef = E2BB1E1A147D7E53002263D0 /* ShowContactDetails.m */; };
 		E2BB1E1E147D88E9002263D0 /* ContactSyncHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = E2BB1E1D147D88E8002263D0 /* ContactSyncHandler.m */; };
 		E2CD2488147F802100550386 /* UIAlertView+BlockExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = E2CD2487147F802100550386 /* UIAlertView+BlockExtensions.m */; };
-		E2CD24AB1484C5EA00550386 /* _PhoneNumber.m in Sources */ = {isa = PBXBuildFile; fileRef = E2CD24AA1484C5EA00550386 /* _PhoneNumber.m */; };
-		E2CD24AC1484C5EA00550386 /* _PhoneNumber.m in Sources */ = {isa = PBXBuildFile; fileRef = E2CD24AA1484C5EA00550386 /* _PhoneNumber.m */; };
+		E2CD24AB1484C5EA00550386 /* _ContactMultiProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = E2CD24AA1484C5EA00550386 /* _ContactMultiProperty.m */; };
+		E2CD24AC1484C5EA00550386 /* _ContactMultiProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = E2CD24AA1484C5EA00550386 /* _ContactMultiProperty.m */; };
 		E2CD24B01484C72F00550386 /* PhoneNumber.m in Sources */ = {isa = PBXBuildFile; fileRef = E2CD24AF1484C72F00550386 /* PhoneNumber.m */; };
+		E2CF37B01490F1020084421A /* EmailAddress.m in Sources */ = {isa = PBXBuildFile; fileRef = E2CF37AF1490F1010084421A /* EmailAddress.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -163,10 +164,12 @@
 		E2BB1E1D147D88E8002263D0 /* ContactSyncHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ContactSyncHandler.m; sourceTree = "<group>"; };
 		E2CD2486147F802100550386 /* UIAlertView+BlockExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIAlertView+BlockExtensions.h"; sourceTree = "<group>"; };
 		E2CD2487147F802100550386 /* UIAlertView+BlockExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIAlertView+BlockExtensions.m"; sourceTree = "<group>"; };
-		E2CD24A91484C5EA00550386 /* _PhoneNumber.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _PhoneNumber.h; sourceTree = "<group>"; };
-		E2CD24AA1484C5EA00550386 /* _PhoneNumber.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = _PhoneNumber.m; sourceTree = "<group>"; };
+		E2CD24A91484C5EA00550386 /* _ContactMultiProperty.h */ = {isa = PBXFileReference; fileEncoding = 4; path = _ContactMultiProperty.h; sourceTree = "<group>"; };
+		E2CD24AA1484C5EA00550386 /* _ContactMultiProperty.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = _ContactMultiProperty.m; sourceTree = "<group>"; };
 		E2CD24AE1484C72F00550386 /* PhoneNumber.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhoneNumber.h; sourceTree = "<group>"; };
 		E2CD24AF1484C72F00550386 /* PhoneNumber.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhoneNumber.m; sourceTree = "<group>"; };
+		E2CF37AE1490F1000084421A /* EmailAddress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EmailAddress.h; sourceTree = "<group>"; };
+		E2CF37AF1490F1010084421A /* EmailAddress.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EmailAddress.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -296,8 +299,8 @@
 				E27357D61482E05F00BCE1BB /* Global.h */,
 				E27357D71483713E00BCE1BB /* _Contact.h */,
 				E27357D81483713E00BCE1BB /* _Contact.m */,
-				E2CD24A91484C5EA00550386 /* _PhoneNumber.h */,
-				E2CD24AA1484C5EA00550386 /* _PhoneNumber.m */,
+				E2CD24A91484C5EA00550386 /* _ContactMultiProperty.h */,
+				E2CD24AA1484C5EA00550386 /* _ContactMultiProperty.m */,
 			);
 			name = Generic;
 			sourceTree = "<group>";
@@ -393,6 +396,8 @@
 				E2BB1E0C147D3EAB002263D0 /* Contact.m */,
 				E2CD24AE1484C72F00550386 /* PhoneNumber.h */,
 				E2CD24AF1484C72F00550386 /* PhoneNumber.m */,
+				E2CF37AE1490F1000084421A /* EmailAddress.h */,
+				E2CF37AF1490F1010084421A /* EmailAddress.m */,
 			);
 			path = AddressbookSyncDemo;
 			sourceTree = "<group>";
@@ -512,7 +517,7 @@
 				E27357DA1483713E00BCE1BB /* _Contact.m in Sources */,
 				E27357E71483812C00BCE1BB /* Contact.m in Sources */,
 				E27357F21484285800BCE1BB /* SelectContactSheetController.m in Sources */,
-				E2CD24AC1484C5EA00550386 /* _PhoneNumber.m in Sources */,
+				E2CD24AC1484C5EA00550386 /* _ContactMultiProperty.m in Sources */,
 				E2B3D6DF148C19820004F4D1 /* AmbigousContactResolverViewController.m in Sources */,
 				E2B3D6E7148F792F0004F4D1 /* TFPerson+CompositeName.m in Sources */,
 				E2B3D6EB148FD9A40004F4D1 /* EmptyNSArrayControllerSelectionValueTransformer.m in Sources */,
@@ -540,7 +545,7 @@
 				E22A5A8614810C8C00485A50 /* AmbigousContactConflictResolverViewController.m in Sources */,
 				E27357A114817E7E00BCE1BB /* UnmatchedContactConflictResolverViewController.m in Sources */,
 				E27357D91483713E00BCE1BB /* _Contact.m in Sources */,
-				E2CD24AB1484C5EA00550386 /* _PhoneNumber.m in Sources */,
+				E2CD24AB1484C5EA00550386 /* _ContactMultiProperty.m in Sources */,
 				E2CD24B01484C72F00550386 /* PhoneNumber.m in Sources */,
 				E23A73BB1487E1B0001AE253 /* TFAddressBook.m in Sources */,
 				E23A73BD1487E1B0001AE253 /* TFBasicSearchElement.m in Sources */,
@@ -551,6 +556,7 @@
 				E23A73C71487E1B0001AE253 /* TFRecord.m in Sources */,
 				E23A73C91487E1B0001AE253 /* TFSearchElement.m in Sources */,
 				E2B3D6E6148F792F0004F4D1 /* TFPerson+CompositeName.m in Sources */,
+				E2CF37B01490F1020084421A /* EmailAddress.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
