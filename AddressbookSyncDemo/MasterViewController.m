@@ -212,8 +212,8 @@
 {
 	Contact *selectedObject = [[self fetchedResultsController] objectAtIndexPath:indexPath];
 	NSLog(@"Contact: %@\n\t{%@}\n\t{%@}\n\t{%@}\n\t{%@}", selectedObject.compositeName, selectedObject.phoneNumbers, selectedObject.emailAddresses, selectedObject.websites, selectedObject.addresses);
-	
-	if (selectedObject.addressbookRecord == NULL) {
+	TFRecord *record = [selectedObject addressbookRecordInAddressBook:[TFAddressBook addressBook]];
+	if (record == NULL) {
 		// Somthing is wrong, lets try to resolve it
 		if (selectedObject.addressbookCacheState == kAddressbookCacheLoadFailed) {
 			[[[UIAlertView alloc] initWithTitle:@"Unmatched contact Details" message:@"The contact failed to match with address book entry" completionBlock:^(NSUInteger buttonIndex) {

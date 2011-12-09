@@ -206,7 +206,7 @@
     return NSTerminateNow;
 }
 
-- (void)resolveMissingContact:(Contact *)contact {
+- (void)resolveMissingContact:(Contact *)contact inAddressBook:(TFAddressBook *)addressbook {
 	if (contact.addressbookCacheState == kAddressbookCacheLoadFailed) {
 		NSLog(@"Contact not found");
 		[unresolvedContactResolver resolveConflict:contact];
@@ -223,20 +223,25 @@
 		[self performBlock:^{
 			[self resolveMissingContact:contact];	
 		} afterDelay:0.5];
-	} else if (contact.addressbookCacheState == kAddressbookCacheLoaded && contact.addressbookRecord != NULL) {
-		[personView setPerson:(ABPerson *)contact.addressbookRecord];
+	} else if (contact.addressbookCacheState == kAddressbookCacheLoaded) {
+		TFRecord *record = [contact.addressbookRecordInAddressBook:addressbook];
+		if (record != NULL) {
+			[personView setPerson:(ABPerson *)record];
+		}
 	}
 }
 
 - (void)setContactSelectionIndex:(NSIndexSet *)value {
 	contactSelectionIndex = value;
+	TFAddressBook *addressbook = [TFAddressBook addressBook];
 	if ([contactSelectionIndex count] != 0) {
 		Contact *contact = [[arrayController arrangedObjects] objectAtIndex:[contactSelectionIndex firstIndex]];
-		if (contact.addressbookRecord == NULL) {
+		TFRecord *record = [contact.addressbookRecordInAddressBook:addressbook];
+		if (record == NULL) {
 			// Somthing is wrong, lets try to resolve it
-			[self resolveMissingContact:contact];
+			[self resolveMissingContact:contact inAddressBook:addressbook];
 		} else {
-			[personView setPerson:(ABPerson *)contact.addressbookRecord];
+			[personView setPerson:(ABPerson *)record;
 		}
 	}
 }

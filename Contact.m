@@ -32,7 +32,6 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 @dynamic secondaryCompositeName;
 
 @synthesize addressbookIdentifier;
-@synthesize addressbookRecord;
 @synthesize _addressbookCacheState;
 
 + (NSOperationQueue *)sharedOperationQueue {
@@ -60,16 +59,6 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 	return (Contact *)[[ContactMappingCache sharedInstance] contactObjectForIdentifier:recordId];
 }
 
-+ (TFAddressBook *)sharedAddressBook {
-	static dispatch_once_t onceToken = 0;
-	__strong static TFAddressBook *_addressbook = nil;
-	dispatch_once(&onceToken, ^{
-		_addressbook = [TFAddressBook addressBook];
-	});
-	return _addressbook;
-}
-
-
 + (Contact *)initContactWithAddressbookRecord:(TFRecord *)record {
 	// Add this contact to the Object Graph
 	Contact *contact = [NSEntityDescription insertNewObjectForEntityForName:@"Contact" inManagedObjectContext:MANAGED_OBJECT_CONTEXT];
@@ -85,14 +74,15 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 	NSLog(@"Contact '%@' has been initialiased, loading details from cache", self.compositeName);
 	self._addressbookCacheState = kAddressbookCacheNotLoaded;
 	if (self.addressbookIdentifier != 0) {
-		if (self.addressbookRecord == nil) { // i.e. we couldn't find the record
+		TFRecord *record = [self addressbookRecordInAddressBook:[TFAddressBook addressBook]];
+		if (record == nil) { // i.e. we couldn't find the record
 			NSLog(@"The value we had for addressbook identifier was incorrect ('%@' didn't exist)", self.compositeName);
 			self.addressbookIdentifier = 0;
 			[[ContactMappingCache sharedInstance] removeIdentifierForContact:self];
 			[[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:kContactSyncStateChangedNotification object:self  userInfo:[NSDictionary dictionaryWithObject:self forKey:NSUpdatedObjectsKey]]];
 			[self syncAddressbookRecord];
 		} else {
-			if ([self isContactOlderThanAddressbookRecord:self.addressbookRecord]) {
+			if ([self isContactOlderThanAddressbookRecord:record]) {
 				NSLog(@"Addressbook contact is newer, we need to update our cache");
 				[self updateManagedObjectWithAddressbookRecordDetails];
 			}
@@ -134,24 +124,6 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 	return ([self.lastSync laterDate:modificationDate] == modificationDate);
 }
 
-- (TFRecord *)findAddressbookRecord {
-	TFRecord * record;
-	if (!self.addressbookRecord) {
-		if (self.addressbookIdentifier) {
-			record = [[[self class] sharedAddressBook] recordForUniqueId:self.addressbookIdentifier];
-			if (record == nil) { // i.e. we couldn't find the record
-				NSLog(@"The value we had for addressbook identifier was incorrect (contact didn't exist)");
-				self.addressbookIdentifier = 0;
-				[[ContactMappingCache sharedInstance] removeIdentifierForContact:self];
-				self._addressbookCacheState = kAddressbookCacheNotLoaded;
-				[[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:kContactSyncStateChangedNotification object:self  userInfo:[NSDictionary dictionaryWithObject:self forKey:NSUpdatedObjectsKey]]];
-			}
-		}
-	}
-	
-	return record;
-}
-
 - (TFRecordID)addressbookIdentifier {
 	if (addressbookIdentifier == 0) {
 		addressbookIdentifier = [[ContactMappingCache sharedInstance] identifierForContact:self];
@@ -160,16 +132,18 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 }
 
 
-- (TFRecord *)addressbookRecord {
+- (TFRecord *)addressbookRecordInAddressBook:(TFAddressBook *)addressBook {
 	if (self.addressbookIdentifier != 0) {
-		return [[[self class] sharedAddressBook] recordForUniqueId:self.addressbookIdentifier];
+		return [addressBook recordForUniqueId:self.addressbookIdentifier];
 	}
 	return nil;
 }
 
 - (void)updateManagedObjectWithAddressbookRecordDetails {
+
+	TFPerson *record = (TFPerson *)[self addressbookRecordInAddressBook:[TFAddressBook addressBook]];
 	
-	if (self.addressbookRecord == 0) {
+	if (record == nil) {
 		NSLog(@"Can't update record, object's _addressbookRecord is nil");
 		NSLog(@"The value we had for addressbook identifier was incorrect ('%@' didn't exist)", self.compositeName);
 		self.addressbookIdentifier = 0;
@@ -177,14 +151,14 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 		_addressbookCacheState = kAddressbookCacheNotLoaded;
 		[self syncAddressbookRecord];
 	} else {
-		NSInteger personFlags = [[self.addressbookRecord valueForProperty:kTFPersonFlags] integerValue];
+		NSInteger personFlags = [[record valueForProperty:kTFPersonFlags] integerValue];
 		self.isCompany = (personFlags & kTFShowAsCompany);
 		
-		self.firstName = [self.addressbookRecord valueForProperty:kTFFirstNameProperty];
-		self.lastName = [self.addressbookRecord valueForProperty:kTFLastNameProperty];
-		self.company = [self.addressbookRecord valueForProperty:kTFOrganizationProperty];
+		self.firstName = [record valueForProperty:kTFFirstNameProperty];
+		self.lastName = [record valueForProperty:kTFLastNameProperty];
+		self.company = [record valueForProperty:kTFOrganizationProperty];
 		
-		NSDate *modificationDate = [self.addressbookRecord valueForProperty:kTFModificationDateProperty];
+		NSDate *modificationDate = [record valueForProperty:kTFModificationDateProperty];
 		if (modificationDate) {
 			self.lastSync = modificationDate;
 		} else {
@@ -277,7 +251,7 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 				} else {
 					[self updateManagedObjectWithAddressbookRecordDetails];
 				}
-				NSLog(@"Match on '%@' [%@]", self.compositeName, [self.addressbookRecord uniqueId]);
+				NSLog(@"Match on '%@' [%@]", self.compositeName, [[self addressbookRecordInAddressBook:addressbook] uniqueId]);
 				return kAddressbookSyncMatchFound;
 			} else {
 				NSLog(@"Ambigous results found");			
@@ -303,7 +277,7 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 	} else {
 		NSString *firstName = (self.firstName?self.firstName:@"");
 		NSString *lastName = (self.lastName?self.lastName:@"");
-		if ([[[self class] sharedAddressBook] defaultNameOrdering] == kTFFirstNameFirst) {
+		if ([[TFAddressBook addressBook] defaultNameOrdering] == kTFFirstNameFirst) {
 			return [NSString stringWithFormat:@"%@ %@", firstName, lastName];
 		} else {
 			return [NSString stringWithFormat:@"%@ %@", lastName, firstName];
@@ -322,7 +296,7 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 	} else {
 		NSString *firstName = (self.firstName?self.firstName:@"");
 		NSString *lastName = (self.lastName?self.lastName:@"");
-		if ([[[self class] sharedAddressBook] defaultNameOrdering] == kTFFirstNameFirst) {
+		if ([[TFAddressBook addressBook] defaultNameOrdering] == kTFFirstNameFirst) {
 			return [NSString stringWithFormat:@"%@ %@", firstName, lastName];
 		} else {
 			return [NSString stringWithFormat:@"%@ %@", lastName, firstName];
@@ -420,7 +394,7 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 
 - (NSArray *)phoneNumbers {
 	if (_phoneNumbers == nil) {
-		TFRecord *record = self.addressbookRecord;
+		TFRecord *record = [self addressbookRecordInAddressBook:[TFAddressBook addressBook]];
 		if (record) {
 			TFMultiValue *properties = [record valueForProperty:kTFPhoneProperty];
 			NSMutableArray *values = [NSMutableArray array];
@@ -452,7 +426,7 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 
 - (NSArray *)emailAddresses {
 	if (_emailAddresses == nil) {
-		TFRecord *record = self.addressbookRecord;
+		TFRecord *record = [self addressbookRecordInAddressBook:[TFAddressBook addressBook]];
 		if (record) {
 			TFMultiValue *properties = [record valueForProperty:kTFEmailProperty];
 			NSMutableArray *values = [NSMutableArray array];
@@ -484,7 +458,7 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 
 - (NSArray *)addresses {
 	if (_addresses == nil) {
-		TFRecord *record = self.addressbookRecord;
+		TFRecord *record = [self addressbookRecordInAddressBook:[TFAddressBook addressBook]];
 		if (record) {
 			TFMultiValue *properties = [record valueForProperty:kTFAddressProperty];
 			NSMutableArray *values = [NSMutableArray array];
@@ -516,7 +490,7 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 
 - (NSArray *)websites {
 	if (_websites == nil) {	
-		TFRecord *record = self.addressbookRecord;
+		TFRecord *record = [self addressbookRecordInAddressBook:[TFAddressBook addressBook]];
 		if (record) {
 			TFMultiValue *properties = [record valueForProperty:kTFURLsProperty];
 			NSMutableArray *values = [NSMutableArray array];
