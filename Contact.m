@@ -1,5 +1,5 @@
 //
-//  _Contact.m
+//  Contact.m
 //  AddressbookSyncDemo
 //
 //  Created by Tom Fewster on 28/11/2011.
@@ -7,13 +7,17 @@
 //
 //#define MULTI_THREADED 1
 
-#import "_Contact.h"
+#import "Contact.h"
+#import "PhoneNumber.h"
+#import "EmailAddress.h"
+#import "Website.h"
+#import "Address.h"
 
 #define MULTI_THREADED 1
 
 NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 
-@implementation _Contact
+@implementation Contact
 
 @dynamic lastSync;
 @dynamic firstName;
@@ -65,6 +69,16 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 	return _addressbook;
 }
 
+
++ (Contact *)initContactWithAddressbookRecord:(TFRecord *)record {
+	// Add this contact to the Object Graph
+	Contact *contact = [NSEntityDescription insertNewObjectForEntityForName:@"Contact" inManagedObjectContext:MANAGED_OBJECT_CONTEXT];
+	contact.addressbookIdentifier = [record uniqueId];
+	[contact updateManagedObjectWithAddressbookRecordDetails];
+	
+	return contact;
+}
+
 - (void)awakeFromFetch {
 	[super awakeFromFetch];
 	
@@ -88,7 +102,7 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 	} else {
 		NSLog(@"Contact '%@' has no identifier in the mapping yet", self.compositeName);
 #ifdef MULTI_THREADED
-		[[_Contact sharedOperationQueue] addOperationWithBlock:^{
+		[[Contact sharedOperationQueue] addOperationWithBlock:^{
 			[self syncAddressbookRecord];
 		}];
 #else
@@ -176,6 +190,19 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 		} else {
 			NSLog(@"Contact has no last modification date");
 		}
+		
+		[self willChangeValueForKey:@"_addresses"];
+		[self willChangeValueForKey:@"_phoneNumbers"];
+		[self willChangeValueForKey:@"_emailAddresses"];
+		[self willChangeValueForKey:@"_websites"];
+		_addresses = nil;
+		_phoneNumbers = nil;
+		_emailAddresses = nil;
+		_websites = nil;
+		[self didChangeValueForKey:@"_addresses"];
+		[self didChangeValueForKey:@"_phoneNumbers"];
+		[self didChangeValueForKey:@"_emailAddresses"];
+		[self didChangeValueForKey:@"_websites"];
 	}
 	
 	[[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:kContactSyncStateChangedNotification object:self  userInfo:[NSDictionary dictionaryWithObject:self forKey:NSUpdatedObjectsKey]]];
@@ -391,6 +418,133 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 	[self resetSearchTags];
 }
 
+- (NSArray *)phoneNumbers {
+	if (_phoneNumbers == nil) {
+		TFRecord *record = self.addressbookRecord;
+		if (record) {
+			TFMultiValue *properties = [record valueForProperty:kTFPhoneProperty];
+			NSMutableArray *values = [NSMutableArray array];
+			for (NSUInteger i = 0; i < [properties count]; i++) {
+				TFMultiValueIdentifier identifier = [properties identifierAtIndex:i];
+				NSUInteger index = NSNotFound;
+				if (_phoneNumbers) {
+					index = [_phoneNumbers indexOfObjectPassingTest:^BOOL(PhoneNumber *obj, NSUInteger idx, BOOL *stop) {
+						return obj.identifier == identifier;
+					}];
+				}
+				
+				PhoneNumber *phoneNumber;
+				if (index == NSNotFound) {
+					NSLog(@"creating new");
+					phoneNumber = [[PhoneNumber alloc] init];
+				} else {
+					NSLog(@"reusing & updating");
+					phoneNumber = [_phoneNumbers objectAtIndex:index];
+				}
+				[values addObject:phoneNumber];
+				[phoneNumber populateWithProperties:properties reference:identifier];
+			}
+			_phoneNumbers = values;
+		}
+	}
+	return _phoneNumbers;
+}
+
+- (NSArray *)emailAddresses {
+	if (_emailAddresses == nil) {
+		TFRecord *record = self.addressbookRecord;
+		if (record) {
+			TFMultiValue *properties = [record valueForProperty:kTFEmailProperty];
+			NSMutableArray *values = [NSMutableArray array];
+			for (NSUInteger i = 0; i < [properties count]; i++) {
+				TFMultiValueIdentifier identifier = [properties identifierAtIndex:i];
+				NSUInteger index = NSNotFound;
+				if (_emailAddresses) {
+					index = [_emailAddresses indexOfObjectPassingTest:^BOOL(PhoneNumber *obj, NSUInteger idx, BOOL *stop) {
+						return obj.identifier == identifier;
+					}];
+				}
+				
+				EmailAddress *emailAddress;
+				if (index == NSNotFound) {
+					NSLog(@"creating new");
+					emailAddress = [[EmailAddress alloc] init];
+				} else {
+					NSLog(@"reusing & updating");
+					emailAddress = [_emailAddresses objectAtIndex:index];
+				}
+				[values addObject:emailAddress];
+				[emailAddress populateWithProperties:properties reference:identifier];
+			}
+			_emailAddresses = values;
+		}
+	}
+	return _emailAddresses;
+}
+
+- (NSArray *)addresses {
+	if (_addresses == nil) {
+		TFRecord *record = self.addressbookRecord;
+		if (record) {
+			TFMultiValue *properties = [record valueForProperty:kTFAddressProperty];
+			NSMutableArray *values = [NSMutableArray array];
+			for (NSUInteger i = 0; i < [properties count]; i++) {
+				TFMultiValueIdentifier identifier = [properties identifierAtIndex:i];
+				NSUInteger index = NSNotFound;
+				if (_addresses) {
+					index = [_addresses indexOfObjectPassingTest:^BOOL(Address *obj, NSUInteger idx, BOOL *stop) {
+						return obj.identifier == identifier;
+					}];
+				}
+				
+				Address *address;
+				if (index == NSNotFound) {
+					NSLog(@"creating new");
+					address = [[Address alloc] init];
+				} else {
+					NSLog(@"reusing & updating");
+					address = [_addresses objectAtIndex:index];
+				}
+				[values addObject:address];
+				[address populateWithProperties:properties reference:identifier];
+			}
+			_addresses = values;
+		}
+	}
+	return _addresses;
+}
+
+- (NSArray *)websites {
+	if (_websites == nil) {	
+		TFRecord *record = self.addressbookRecord;
+		if (record) {
+			TFMultiValue *properties = [record valueForProperty:kTFURLsProperty];
+			NSMutableArray *values = [NSMutableArray array];
+			for (NSUInteger i = 0; i < [properties count]; i++) {
+				TFMultiValueIdentifier identifier = [properties identifierAtIndex:i];
+				NSUInteger index = NSNotFound;
+				if (_websites) {
+					index = [_websites indexOfObjectPassingTest:^BOOL(Website *obj, NSUInteger idx, BOOL *stop) {
+						return obj.identifier == identifier;
+					}];
+				}				
+				Website *website;
+				if (index == NSNotFound) {
+					NSLog(@"creating new");
+					website = [[Website alloc] init];
+				} else {
+					NSLog(@"reusing & updating");
+					website = [_websites objectAtIndex:index];
+				}
+				[values addObject:website];
+				[website populateWithProperties:properties reference:identifier];
+			}
+			_websites = values;
+		}
+	}
+	return _websites;
+}
+
 @end
 
 
@@ -442,14 +596,14 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 	}
 }
 
-- (TFRecordID)identifierForContact:(_Contact *)contact {
+- (TFRecordID)identifierForContact:(Contact *)contact {
 	@synchronized(self) {
 		NSString *key = [[contact.objectID URIRepresentation] absoluteString];
 		return [_mappings objectForKey:key];
 	}
 }
 
-- (void)setIdentifier:(TFRecordID)identifier forContact:(_Contact *)contact {
+- (void)setIdentifier:(TFRecordID)identifier forContact:(Contact *)contact {
 	NSString *key = [[contact.objectID URIRepresentation] absoluteString];
 	@synchronized(self) {
 		NSMutableDictionary *newMappings = [NSMutableDictionary dictionaryWithDictionary:_mappings];
@@ -459,7 +613,7 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 	_changed = YES;
 }
 
-- (void)removeIdentifierForContact:(_Contact *)contact {
+- (void)removeIdentifierForContact:(Contact *)contact {
 	NSString *key = [[contact.objectID URIRepresentation] absoluteString];
 	@synchronized(self) {
 		NSMutableDictionary *newMappings = [NSMutableDictionary dictionaryWithDictionary:_mappings];
@@ -477,7 +631,7 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 	}
 }
 
-- (_Contact *)contactObjectForIdentifier:(TFRecordID)uniqueID {
+- (Contact *)contactObjectForIdentifier:(TFRecordID)uniqueID {
 	if ([self contactExistsForIdentifier:uniqueID]) {
 		@synchronized(self) {
 			NSString *identifier = nil;
@@ -489,7 +643,7 @@ NSString *kContactSyncStateChangedNotification = @"kContactSyncStateChanged";
 					if (objectURL) {
 						NSManagedObjectID *objectId = [[MANAGED_OBJECT_CONTEXT persistentStoreCoordinator] managedObjectIDForURIRepresentation:objectURL];
 						if (objectId) {
-							_Contact *contact = (_Contact *)[MANAGED_OBJECT_CONTEXT existingObjectWithID:objectId error:&error];
+							Contact *contact = (Contact *)[MANAGED_OBJECT_CONTEXT existingObjectWithID:objectId error:&error];
 							if (error) {
 								NSLog(@"Error retreiving object: %@", [error localizedDescription]);
 							}

@@ -26,23 +26,7 @@ typedef enum {
 
 extern NSString *kContactSyncStateChangedNotification;
 
-
-@class Contact;
-
-@protocol Contact <NSObject>
-
-
-@property (weak, nonatomic, readonly) NSArray *phoneNumbers;
-@property (weak, nonatomic, readonly) NSArray *emailAddresses;
-@property (weak, nonatomic, readonly) NSArray *addresses;
-@property (weak, nonatomic, readonly) NSArray *websites;
-
-+ (Contact *)initContactWithAddressbookRecord:(TFRecord *)record;
-
-@end
-
-
-@interface _Contact : NSManagedObject {
+@interface Contact : NSManagedObject {
 	AddressbookCacheState _addressbookCacheState;
 	NSArray *_ambigousPossibleMatches;
 	NSArray *_phoneNumbers;
@@ -68,14 +52,16 @@ extern NSString *kContactSyncStateChangedNotification;
 
 @property (weak, nonatomic, readonly) NSString *groupingIndexCharacter;
 
-#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-@property (nonatomic, assign) TFRecordID addressbookIdentifier;
-#else
 @property (nonatomic, strong) TFRecordID addressbookIdentifier;
-#endif
 @property (nonatomic, readonly, weak) TFRecord *addressbookRecord;
 
-+ (_Contact *)findContactForRecordId:(TFRecordID)recordId;
+@property (weak, nonatomic, readonly) NSArray *phoneNumbers;
+@property (weak, nonatomic, readonly) NSArray *emailAddresses;
+@property (weak, nonatomic, readonly) NSArray *addresses;
+@property (weak, nonatomic, readonly) NSArray *websites;
+
++ (Contact *)initContactWithAddressbookRecord:(TFRecord *)record;
++ (Contact *)findContactForRecordId:(TFRecordID)recordId;
 + (NSOperationQueue *)sharedOperationQueue;
 + (TFAddressBook *)sharedAddressBook;
 
@@ -93,9 +79,9 @@ extern NSString *kContactSyncStateChangedNotification;
 	BOOL _changed;
 }
 + (ContactMappingCache *)sharedInstance;
-- (TFRecordID)identifierForContact:(_Contact *)contact;
-- (void)setIdentifier:(TFRecordID)identifier forContact:(_Contact *)contact;
-- (void)removeIdentifierForContact:(_Contact *)contact;
+- (TFRecordID)identifierForContact:(Contact *)contact;
+- (void)setIdentifier:(TFRecordID)identifier forContact:(Contact *)contact;
+- (void)removeIdentifierForContact:(Contact *)contact;
 - (BOOL)contactExistsForIdentifier:(TFRecordID)identifier;
-- (_Contact *)contactObjectForIdentifier:(TFRecordID)identifier;
+- (Contact *)contactObjectForIdentifier:(TFRecordID)identifier;
 @end

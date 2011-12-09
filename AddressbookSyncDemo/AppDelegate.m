@@ -11,6 +11,7 @@
 #import "MasterViewController.h"
 #import "ContactSyncHandler.h"
 #import "TFABAddressBook.h"
+#import "Contact.h"
 
 @implementation AppDelegate
 
@@ -40,7 +41,9 @@
 	}
 	
 	[TFAddressBook sharedAddressBook];
-	
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(contactUpdated:) name:kTFDatabaseChangedExternallyNotification object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(contactUpdated:) name:kTFDatabaseChangedNotification object:nil];
+
     return YES;
 }
 							
@@ -232,6 +235,25 @@
 - (NSString *)applicationDocumentsDirectory
 {
 	return [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+}
+
+-(void)contactUpdated:(NSNotification *)notification {
+	
+	for (NSString *recordId in [[notification userInfo] objectForKey:kTFUpdatedRecords]) {
+		Contact *contact = (Contact *)[Contact findContactForRecordId:recordId];
+		if (contact) {
+			NSLog(@"Our contact has been updated");
+			[contact updateManagedObjectWithAddressbookRecordDetails];
+		}
+	}
+	
+	for (NSString *recordId in [[notification userInfo] objectForKey:kTFDeletedRecords]) {
+		Contact *contact = (Contact *)[Contact findContactForRecordId:recordId];
+		if (contact) {
+			NSLog(@"Our contact has been removed from the addressbook");
+			[contact updateManagedObjectWithAddressbookRecordDetails];
+		}
+	}
 }
 
 @end

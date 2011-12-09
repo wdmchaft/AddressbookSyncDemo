@@ -7,6 +7,7 @@
 //
 
 #import "_ContactMultiProperty.h"
+#import "TFABAddressBook.h"
 
 @implementation _ContactMultiProperty
 
@@ -21,7 +22,7 @@
 - (void)populateWithProperties:(TFMultiValue *)properties reference:(TFMultiValueIdentifier)id {
 	self.identifier = id;
 	[self willChangeValueForKey:@"_label"];
-	_label = [properties labelForIdentifier:identifier];
+	_label = TFLocalizedPropertyOrLabel([properties labelForIdentifier:identifier]);
 	[self didChangeValueForKey:@"_label"];
 	[self willChangeValueForKey:@"_value"];
 	_value = [properties valueForIdentifier:identifier];
