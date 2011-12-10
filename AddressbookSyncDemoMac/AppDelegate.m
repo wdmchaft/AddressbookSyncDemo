@@ -9,7 +9,6 @@
 #import "AppDelegate.h"
 #import "Contact.h"
 #import "NSObject+BlockExtensions.h"
-#import "TFABAddressBook.h"
 #import "AmbigousContactResolverViewController.h"
 #import "UnresolvedContactResolverViewController.h"
 
@@ -221,10 +220,10 @@
 	} else if (contact.addressbookCacheState == kAddressbookCacheCurrentlyLoading) {
 		// lets try again in a 1/2 a second
 		[self performBlock:^{
-			[self resolveMissingContact:contact];	
+			[self resolveMissingContact:contact inAddressBook:addressbook];	
 		} afterDelay:0.5];
 	} else if (contact.addressbookCacheState == kAddressbookCacheLoaded) {
-		TFRecord *record = [contact.addressbookRecordInAddressBook:addressbook];
+		TFRecord *record = [contact addressbookRecordInAddressBook:addressbook];
 		if (record != NULL) {
 			[personView setPerson:(ABPerson *)record];
 		}
@@ -233,15 +232,15 @@
 
 - (void)setContactSelectionIndex:(NSIndexSet *)value {
 	contactSelectionIndex = value;
-	TFAddressBook *addressbook = [TFAddressBook addressBook];
+	_addressbook = [TFAddressBook addressBook];
 	if ([contactSelectionIndex count] != 0) {
 		Contact *contact = [[arrayController arrangedObjects] objectAtIndex:[contactSelectionIndex firstIndex]];
-		TFRecord *record = [contact.addressbookRecordInAddressBook:addressbook];
+		TFRecord *record = [contact addressbookRecordInAddressBook:_addressbook];
 		if (record == NULL) {
 			// Somthing is wrong, lets try to resolve it
-			[self resolveMissingContact:contact inAddressBook:addressbook];
+			[self resolveMissingContact:contact inAddressBook:_addressbook];
 		} else {
-			[personView setPerson:(ABPerson *)record;
+			[personView setPerson:(ABPerson *)record];
 		}
 	}
 }
@@ -253,8 +252,8 @@
 - (IBAction)toggelEdit:(NSButton *)button {
 	if (personView.editing) {
 		personView.editing = NO;
-		if ([[Contact sharedAddressBook] hasUnsavedChanges]) {
-			[[Contact sharedAddressBook] save];
+		if ([_addressbook hasUnsavedChanges]) {
+			[_addressbook save];
 		}
 		button.title = @"Edit";
 	} else {

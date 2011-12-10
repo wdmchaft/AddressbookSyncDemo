@@ -8,11 +8,14 @@
 
 #import <Cocoa/Cocoa.h>
 #import <AddressBook/ABPersonView.h>
+#import "TFABAddressBook.h"
 
 @class AmbigousContactResolverViewController;
 @class UnresolvedContactResolverViewController;
 
-@interface AppDelegate : NSObject <NSApplicationDelegate>
+@interface AppDelegate : NSObject <NSApplicationDelegate> {
+	TFAddressBook *_addressbook;
+}
 
 @property (assign) IBOutlet NSWindow *window;
 

@@ -8,7 +8,7 @@
 
 #import "TFPerson+CompositeName.h"
 
-@implementation TFPerson (CompositeName)
+@implementation ABPerson (CompositeName)
 
 - (NSString *)compositeName {
 #if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR

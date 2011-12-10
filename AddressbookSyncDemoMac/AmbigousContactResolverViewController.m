@@ -63,10 +63,11 @@
 
 - (void)newContactSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo {
 	if (returnCode == NSOKButton ) {
-		ABPerson *record = (ABPerson *)[addressbook recordForUniqueId:[self.contact.ambigousContactMatches objectAtIndex:[contactSelectionIndex firstIndex]]];
+		TFRecordID uid = [self.contact.ambigousContactMatches objectAtIndex:[contactSelectionIndex firstIndex]];
+		ABPerson *record = (ABPerson *)[addressbook recordForUniqueId:uid];
 		if ([record isKindOfClass:[ABPerson class]]) {
 			//			NSString *uid = [record valueForProperty:kABUIDProperty];
-			[self.contact resolveConflictWithAddressbookRecord:record];
+			[self.contact resolveConflictWithAddressbookRecordId:uid];
 		}
 	}
 	[objectSheet orderOut:self];

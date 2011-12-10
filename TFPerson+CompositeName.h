@@ -8,7 +8,7 @@
 
 #import "TFABAddressBook.h"
 
-@interface TFPerson (CompositeName)
+@interface ABPerson (CompositeName)
 
 @property (nonatomic, readonly, weak) NSString *compositeName;
 
