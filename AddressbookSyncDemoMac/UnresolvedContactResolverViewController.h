@@ -12,7 +12,10 @@
 @class Contact;
 @class ABPersonView;
 
-@interface UnresolvedContactResolverViewController : NSViewController
+@interface UnresolvedContactResolverViewController : NSViewController {
+	NSArray *_people;
+	TFAddressBook *addressbook;
+}
 
 @property (nonatomic, strong) IBOutlet NSWindow *documentWindow;
 @property (nonatomic, strong) IBOutlet NSPanel *objectSheet;
@@ -21,6 +24,7 @@
 @property (nonatomic, retain) NSIndexSet *contactSelectionIndex;
 @property (nonatomic, strong) Contact *contact;
 @property (strong) NSArray *ambigousContacts;
+@property (strong, readonly, getter = people) NSArray *_people;
 
 - (IBAction)resolveConflict:(Contact *)contact;
 - (IBAction)later:(id)sender;

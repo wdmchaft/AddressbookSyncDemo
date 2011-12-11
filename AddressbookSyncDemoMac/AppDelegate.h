@@ -12,6 +12,7 @@
 
 @class AmbigousContactResolverViewController;
 @class UnresolvedContactResolverViewController;
+@class Contact;
 
 @interface AppDelegate : NSObject <NSApplicationDelegate> {
 	TFAddressBook *_addressbook;
@@ -30,6 +31,7 @@
 
 @property (weak, readonly, nonatomic) NSArray *sortDescriptors;
 @property (strong) NSPredicate *searchFilter;
+@property (strong) Contact *selectedContact;
 
 - (IBAction)saveAction:(id)sender;
 

@@ -20,10 +20,12 @@
 @synthesize personView;
 @synthesize contact;
 @synthesize ambigousContacts;
+@synthesize _people;
 
 - (void)awakeFromNib {
 	// since we will only ever have one window, we can do this
 	documentWindow = [[NSApplication sharedApplication] keyWindow];
+	addressbook = [TFAddressBook addressBook];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(documentWindowWillClose:) name:NSWindowWillCloseNotification object:documentWindow];
 }
 
@@ -33,6 +35,15 @@
 
 - (IBAction)resolveConflict:(Contact *)c {
 	self.contact = c;
+	
+	NSMutableArray *p = [NSMutableArray array];
+	NSArray *people = [addressbook people];
+	for (TFPerson *record in [people sortedArrayUsingDescriptors:[NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"compositeName" ascending:YES]]]) {
+		[p addObject:[record uniqueId]];
+		NSLog(@"%@", [record compositeName]);
+	}
+	_people = p;
+		
 	
     if (objectSheet == nil) {
         NSBundle *myBundle = [NSBundle bundleForClass:[self class]];
@@ -73,17 +84,17 @@
 	[objectSheet orderOut:self];
 }
 
-/*
+
 - (void)setContactSelectionIndex:(NSIndexSet *)value {
 	contactSelectionIndex = value;
 	if ([contactSelectionIndex count] != 0) {
-		ABPerson *selected = (ABPerson *)[addressbook recordForUniqueId:[self.contact.ambigousContactMatches objectAtIndex:[contactSelectionIndex firstIndex]]];
+		ABPerson *selected = (ABPerson *)[addressbook recordForUniqueId:[self.arrayController.arrangedObjects objectAtIndex:[contactSelectionIndex firstIndex]]];
 		NSLog(@"Selected: '%@'", selected.compositeName);
 		[personView setPerson:(ABPerson *)selected];
 	} else {
 		[personView setPerson:nil];
 	}
 }
- */
+
 
 @end

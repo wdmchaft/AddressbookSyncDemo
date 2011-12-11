@@ -24,6 +24,7 @@
 @synthesize searchFilter;
 @synthesize ambigousContactResolver;
 @synthesize unresolvedContactResolver;
+@synthesize selectedContact;
 
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
@@ -232,16 +233,20 @@
 
 - (void)setContactSelectionIndex:(NSIndexSet *)value {
 	contactSelectionIndex = value;
-	_addressbook = [TFAddressBook addressBook];
+	if (_addressbook == nil) {
+		_addressbook = [TFAddressBook addressBook];
+	}
 	if ([contactSelectionIndex count] != 0) {
-		Contact *contact = [[arrayController arrangedObjects] objectAtIndex:[contactSelectionIndex firstIndex]];
-		TFRecord *record = [contact addressbookRecordInAddressBook:_addressbook];
+		self.selectedContact = [[arrayController arrangedObjects] objectAtIndex:[contactSelectionIndex firstIndex]];
+		TFRecord *record = [self.selectedContact addressbookRecordInAddressBook:_addressbook];
 		if (record == NULL) {
 			// Somthing is wrong, lets try to resolve it
-			[self resolveMissingContact:contact inAddressBook:_addressbook];
+			[self resolveMissingContact:self.selectedContact inAddressBook:_addressbook];
 		} else {
 			[personView setPerson:(ABPerson *)record];
 		}
+	} else {
+		self.selectedContact = nil;
 	}
 }
 
